@@ -1,11 +1,11 @@
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
-    font-family: "poppins",sans-serif;
+    font-family: "poppins", sans-serif;
 }
 
-.navbar{
+.navbar {
     position: absolute;
     left: 0;
     top: 0;
@@ -14,14 +14,15 @@
     width: 18%;
     padding-left: 20px;
 }
-.head{
+
+.head {
     display: flex;
     flex-direction: column;
     line-height: 1;
     margin-top: 30px;
 }
 
-.head span{
+.head span {
     background-color: #822cfb;
     border-radius: 4px;
     padding-top: 3px;
@@ -30,36 +31,37 @@
     padding-right: 6px;
     font-size: 15px;
 }
-.creator{
+
+.creator {
     font-size: 35px;
     text-decoration: none;
     color: #fff;
     padding: 0;
     margin: 0;
-    
+
 }
 
-.manager{
+.manager {
     text-decoration: none;
     color: #fff;
     font-size: 20px;
     font-weight: 600;
 }
 
-.dashboard{
-     margin-top: 40px;
+.dashboard {
+    margin-top: 40px;
     font-size: 18px;
-    font-weight:200;
-    color:#fff;
+    font-weight: 200;
+    color: #fff;
     cursor: pointer;
-     width: 91%;
+    width: 91%;
     padding: 10px;
     border-radius: 10px;
     box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
 
 }
 
-.ai{
+.ai {
     box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
     border-radius: 12px;
     margin-right: 20px;
@@ -70,35 +72,36 @@
     justify-content: center;
     align-items: start;
     color: white;
+    width: 91%;
 }
 
-.ai h1{
+.ai h1 {
     font-size: 20px;
     font-weight: 500;
 }
 
-.ai p{
+.ai p {
     font-weight: 400;
     opacity: 0.7;
 }
 
-.buisness{
+.buisness {
     font-size: 15px;
-    font-weight:400;
-    padding-top:7px;
-    margin-bottom:10px;
+    font-weight: 400;
+    padding-top: 7px;
+    margin-bottom: 10px;
 }
 
-.answer{
+.answer {
     font-size: 12px;
-   
+
 }
 
-.about{
+.about {
     margin-top: 2px;
 }
 
-#assistant{
+#assistant {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -109,10 +112,278 @@
     font-size: 12px;
     padding-top: 10px;
     padding-bottom: 10px;
-    padding-left: 20px;
+
     padding-right: 20px;
     margin-top: 20px;
     width: 185px;
     border: none;
     border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+#assistant:hover {
+    background-color: #964eff;
+    transform: translateY(-2px);
+}
+
+/* ==========================================================================
+   Responsive Navigation Layout
+   ========================================================================== */
+
+/* Default / Desktop Header elements block */
+.navbar-header {
+    display: block;
+}
+
+.menu-toggle {
+    display: none;
+}
+
+.navbar-menu {
+    display: block;
+}
+
+
+
+
+.dashboard:hover {
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+    width: 91%;
+    padding: 10px;
+    border-radius: 10px;
+    transition: 0.3s;
+
+    transform: translateY(-5px) scale(1.05);
+
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+}
+
+
+
+.ai:hover {
+    transition: 0.3s;
+
+    transform: translateY(-5px) scale(1.05);
+
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+
+}
+
+.Ask:hover {
+    transition: 0.3s;
+
+    transform: translateY(-5px) scale(1.05);
+
+    box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+
+}
+
+
+
+
+
+
+/* Desktop Styles: width >= 1025px */
+@media (min-width: 1025px) {
+    .navbar {
+        width: 18%;
+        min-width: 250px;
+        position: fixed;
+        height: 100vh;
+    }
+
+    #assistant {
+        width: 100%;
+
+    }
+
+
+}
+
+/* Tablet Styles: 789px - 1024px */
+@media (min-width: 789px) and (max-width: 1024px) {
+    .navbar {
+        width: 240px;
+        position: fixed;
+        height: 100vh;
+    }
+
+    .creator {
+        font-size: 30px;
+    }
+
+    .manager {
+        font-size: 18px;
+    }
+
+    .ai {
+        margin-right: 10px;
+        padding: 15px;
+    }
+
+    #assistant {
+        width: 100%;
+    }
+}
+
+/* Mobile Styles: <= 788px (Covers the max-width: 786px requirement) */
+@media (max-width: 788px) {
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        /* Changed to auto to allow height transitions */
+        max-height: 100px;
+        padding-left: 0;
+        padding-right: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        overflow: hidden;
+        transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1000;
+        background-color: #15122f;
+    }
+
+    /* Expanded Navbar State */
+    .navbar.active {
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+
+    /* Navbar top header styling */
+    .navbar-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        /* Aligns both logo and toggle to the top */
+        width: 100%;
+        height: auto;
+        min-height: 60px;
+        padding: 0 15px;
+        padding-bottom: 15px;
+        /* Adds breathing room below the logo */
+    }
+
+    /* Logo placement */
+    .head {
+        margin-top: 20px !important;
+        margin-left: 10px !important;
+        margin-bottom: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        line-height: 1.1;
+    }
+
+    .head span {
+        font-size: 10px;
+        padding: 1px 4px;
+    }
+
+    /* Hamburger Menu Toggle Button */
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 24px;
+        /* hamburger menu font size:24px */
+        cursor: pointer;
+        outline: none;
+        margin-top: 20px;
+        /* matches logo vertical alignment */
+        margin-right: 10px;
+        padding: 0;
+        transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .menu-toggle:hover {
+        color: #822cfb;
+    }
+
+    /* Collapsible Navigation Menu Items */
+    .navbar-menu {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 100%;
+        padding: 20px 15px;
+        margin-top: 25px;
+        opacity: 0;
+        transform: translateY(-10px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        background-color: #15122f;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .navbar.active .navbar-menu {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .dashboard {
+        margin-top: 15px;
+        width: 90%;
+        max-width: 320px;
+        padding: 12px;
+        text-align: center;
+    }
+
+    .ai {
+        box-shadow: 0 8px 24px rgba(255, 255, 255, 0.3);
+        border-radius: 12px;
+        margin-right: 20px;
+        margin-top: 40px;
+        padding: 20px;
+
+
+    }
+
+    .ai h1 {
+        font-size: 20px;
+        margin-bottom: 5px;
+    }
+
+    #assistant {
+        width: 100%;
+        max-width: 240px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        background-color: #822cfb;
+        color: #fff;
+        font-weight: 500;
+        font-size: 12px;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        padding-left: 20px;
+        padding-right: 20px;
+        margin-top: 15px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+}
+
+.intro {
+    margin-left: 280px;
+    margin-top: 20px;
+}
+
+.intro h1 {
+    font-size: 30px;
+    font-weight: 500;
+
+}
+
+.intro p {
+    opacity: 0.6;
+
 }
