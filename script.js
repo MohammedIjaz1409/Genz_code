@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (menuToggle && navbar && toggleIcon) {
         menuToggle.addEventListener('click', () => {
             navbar.classList.toggle('active');
-            
+
             if (navbar.classList.contains('active')) {
                 toggleIcon.className = 'fa-solid fa-xmark';
             } else {
@@ -14,4 +14,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+});
+
+//calendar//
+flatpickr("#daterange", {
+    mode: "range",
+    format: "Y-m-d",
+
+
+
+
 });

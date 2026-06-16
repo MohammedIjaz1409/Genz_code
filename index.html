@@ -13,6 +13,9 @@
         integrity="sha512-2SwdPD6INVrV/lHTZbO2nodKhrnDdJK9/kg2XD1r9uGqPo1cUbujc+IYdlYdEErWNu69gVcYgdxlmVmzTWnetw=="
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
     <title>AI Creator Business Manager|In single platform</title>
 </head>
 
@@ -44,8 +47,74 @@
     </div>
 
     <div class="intro">
-        <h1>Welcome back,</h1>
-        <p>Here's your creator buisness manager, all in one platform.</p>
+        <div class="welcome">
+            <h1>Welcome back,</h1>
+            <p>Here's your creator buisness manager, all in one platform.</p>
+        </div>
+
+        <div class="calendar">
+            <input type="text" id="daterange" placeholder="Select date & view Events">
+        </div>
+
+        <div class="notification">
+            <i class="fa-regular fa-bell" style="color: rgb(0, 0, 0);"></i>
+        </div>
+
+        <div class="newcont">
+            <p>+ New Task & Remainders</p>
+        </div>
+    </div>
+
+    <div class="analytics">
+        <div class="revenue total">
+            <p>Total Revenue</p> <i class="fa-solid fa-dollar-sign" style="color: rgb(0, 0, 0);"></i>
+
+        </div>
+
+        <div class="revenue brand">
+            <p>Brand Deals</p> <i class="fa-regular fa-handshake" style="color: rgb(0, 0, 0);"></i>
+
+        </div>
+
+
+        <div class="revenue audience">
+            <p>Audience Growth</p> <i class="fa-solid fa-users" style="color: rgb(0, 0, 0);"></i>
+
+        </div>
+
+
+        <div class="revenue engagement">
+            <p>Engagement Rate</p> <i class="fa-regular fa-heart" style="color: rgb(0, 0, 0);"></i>
+
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="overview graph">
+            <h1>Revenue Overview</h1>
+        </div>
+
+        <div class="overview secgrapgh">
+            <h1>Revenue by Source</h1>
+        </div>
+
+        <div class="overview thirdgrapgh">
+            <h1>AI Buisness Recommendation</h1>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="overview upcoming">
+            <h1>Upcoming Content</h1>
+        </div>
+
+        <div class="overview top">
+            <h1>Top Performing Content</h1>
+        </div>
+
+        <div class="overview tasks">
+            <h1>Tasks & Remainders</h1>
+        </div>
     </div>
 
 
@@ -54,6 +123,7 @@
 
 
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="script.js"></script>
 </body>
 
