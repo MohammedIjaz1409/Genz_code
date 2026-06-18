@@ -14,6 +14,8 @@
         crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
 
+   
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
     <title>AI Creator Business Manager|In single platform</title>
@@ -42,8 +44,14 @@
                 <p class="answer about">about your creator business</p>
 
                 <button id="assistant">Ask AI Assistant</button>
+
             </div>
         </div>
+
+
+
+
+    </div>
     </div>
 
     <div class="intro">
@@ -122,6 +130,63 @@
 
 
 
+
+    <!-- Floating AI Chatbot -->
+    <div class="ai-chatbot-container" id="aiChatbot">
+        <!-- Chatbot Header -->
+        <div class="chatbot-header">
+            <div class="chatbot-header-content">
+                <i class="fa-solid fa-robot" style="color: #822cfb;"></i>
+                <h3>AI Assistant</h3>
+            </div>
+            <button class="chatbot-close-btn" id="chatbotCloseBtn" aria-label="Close Chatbot">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Chat Messages Area -->
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="chat-message ai-message">
+                <div class="message-content">
+                    <p>Hello! 👋 I'm your AI Assistant. How can I help you with your creator business today?</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Typing Indicator -->
+        <div class="typing-indicator" id="typingIndicator" style="display: none;">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+
+        <!-- Chat Input Area -->
+        <div class="chatbot-input-area">
+            <input 
+                type="text" 
+                id="chatInput" 
+                class="chat-input" 
+                placeholder="Type your question..."
+                aria-label="Chat message input"
+            >
+            <button class="chat-send-btn" id="chatSendBtn" aria-label="Send message">
+                <i class="fa-solid fa-paper-plane"></i>
+            </button>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="chatbot-actions">
+            <button class="action-btn" id="submitBtn">
+                <i class="fa-solid fa-check"></i> Submit
+            </button>
+        </div>
+    </div>
+
+    <!-- Floating Button (initially visible) -->
+    <div class="floating-ai-button" id="floatingButton">
+        <i class="fa-solid fa-robot"></i>
+        <span class="button-label">AI Assistant</span>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="script.js"></script>

@@ -66,7 +66,21 @@ Result: Implemented code successfully without any problem and changed width manu
 
 No prompt , Only self code.
 
+
+
 ## 18 JUNE 2026
 
-No promt , No code due to unavoidable 
+## Prompt 1
+
+Generate a code to make my website completely responsive for mobile , tablet , desktop . mobile max-width:786px; tablet min-width:789px and max-width:1024px;desktop max-width:1025px;                                               where all the div boxes are fully responsive and change accordingly to the devices used . , keep the same resposive that aldready made for logo,navigation bar and hamburger menu -do nto change anything from that , make fully responsive website according to the given requirement 
+
+Failure : All my div Boxes become invisible and doesnt make reponsive.
+
+## PROMPT 2
+
+Create a modern floating AI chatbot that appears at the bottom-left corner when the AI Assistant button is clicked. The chatbot should have a compact size , smooth open/close animations, a header with an AI icon and close button, a scrollable chat area, message input field, Send and Submit buttons, typing indicator animation, and a professional  design. The chatbot should be responsive,  defaultly hidden , and open/close with smooth transitions.the AI chatbot should not hide any element and the colour should be white , matching colors with website
+
+
+
+
 

@@ -588,3 +588,773 @@ body {
     height: 300px;
     width: 425px;
 }
+
+
+/* ==========================================================================
+   RESPONSIVE: Content Sections
+   Only .intro, .analytics, .content, and their children.
+   Navbar / Logo / Hamburger styles above are NOT modified.
+   ========================================================================== */
+
+/* ---------- DESKTOP  (min-width: 1025px) ---------- */
+@media (min-width: 1025px) {
+
+    /* Intro bar — buttons wrap as a group, never individually */
+    .intro {
+        margin-left: 280px;
+        width: calc(100% - 280px);
+        margin-top: 20px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 16px;
+        padding-right: 24px;
+    }
+
+    .intro h1 {
+        font-size: 30px;
+        font-weight: 500;
+    }
+
+    .welcome {
+        flex: 1 0 auto;
+    }
+
+    .welcome p {
+        opacity: 0.6;
+    }
+
+    .calendar {
+        height: 40px;
+        width: 180px;
+        margin-top: 0;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+
+    .notification {
+        height: 40px;
+        width: 40px;
+        margin-top: 0;
+        flex-shrink: 0;
+    }
+
+    .newcont {
+        height: 40px;
+        width: 220px;
+        margin-top: 0;
+        margin-right: 0;
+        flex-shrink: 0;
+    }
+
+    /* Analytics row */
+    .analytics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+        margin-left: 280px;
+        padding-right: 24px;
+    }
+
+    .revenue {
+        flex: 1 1 200px;
+        height: 140px;
+        width: auto;
+        margin-right: 0;
+    }
+
+    /* Content rows */
+    .content {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-left: 280px;
+        margin-top: 30px;
+        padding-right: 24px;
+        margin-bottom: 30px;
+    }
+
+    .overview {
+        flex: 1 1 280px;
+        margin-right: 0;
+    }
+
+    .graph,
+    .upcoming {
+        height: 300px;
+        width: auto;
+        flex: 2 1 380px;
+    }
+
+    .secgrapgh,
+    .thirdgrapgh,
+    .top,
+    .tasks {
+        height: 300px;
+        width: auto;
+        flex: 1 1 260px;
+    }
+}
+
+
+/* ---------- TABLET  (789px – 1024px) ---------- */
+@media (min-width: 789px) and (max-width: 1024px) {
+
+    /* Intro bar — buttons wrap as a group, never individually */
+    .intro {
+        margin-left: 256px;
+        width: calc(100% - 256px);
+        margin-top: 20px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding-right: 16px;
+    }
+
+    .welcome {
+        flex: 1 0 auto;
+    }
+
+    .intro h1 {
+        font-size: 24px;
+        font-weight: 500;
+    }
+
+    .welcome p {
+        opacity: 0.6;
+        font-size: 13px;
+    }
+
+    .calendar {
+        height: 40px;
+        width: 150px;
+        margin-top: 0;
+        margin-left: 0;
+        flex-shrink: 0;
+    }
+
+    .notification {
+        height: 40px;
+        width: 40px;
+        margin-top: 0;
+        flex-shrink: 0;
+    }
+
+    .newcont {
+        height: 40px;
+        width: auto;
+        min-width: 150px;
+        padding: 0 14px;
+        margin-top: 0;
+        margin-right: 0;
+        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+    /* Analytics — 2-column grid */
+    .analytics {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-top: 20px;
+        margin-left: 256px;
+        padding-right: 16px;
+    }
+
+    .revenue {
+        height: 120px;
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .revenue p {
+        font-size: 13px;
+    }
+
+    /* Content rows — 2-column grid */
+    .content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+        margin-left: 256px;
+        margin-top: 20px;
+        padding-right: 16px;
+        margin-bottom: 20px;
+    }
+
+    .overview {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    /* First card in each content row spans full width */
+    .content .overview:first-child {
+        grid-column: 1 / -1;
+    }
+
+    .graph,
+    .secgrapgh,
+    .thirdgrapgh,
+    .upcoming,
+    .top,
+    .tasks {
+        height: 260px;
+        width: 100%;
+    }
+
+    .overview h1 {
+        font-size: 15px;
+    }
+}
+
+
+/* ---------- MOBILE  (max-width: 788px — covers ≤786px) ---------- */
+@media (max-width: 788px) {
+
+    /* Intro bar — welcome on top, action items in a single row below */
+    .intro {
+        margin-left: 0;
+        width: 100%;
+        margin-top: 110px;
+        /* push below fixed mobile navbar */
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        padding: 0 16px 16px 16px;
+    }
+
+    /* Welcome text takes full width so it sits on its own row */
+    .welcome {
+        flex: 0 0 100%;
+    }
+
+    .intro h1 {
+        font-size: 22px;
+        font-weight: 500;
+    }
+
+    .welcome p {
+        opacity: 0.6;
+        font-size: 13px;
+    }
+
+    /* Calendar, notification, new-task stay on ONE line */
+    .calendar {
+        height: 40px;
+        flex: 1 1 auto;
+        min-width: 100px;
+        margin-top: 0;
+        margin-left: 0;
+    }
+
+    .notification {
+        height: 40px;
+        width: 40px;
+        margin-top: 0;
+        flex-shrink: 0;
+    }
+
+    .newcont {
+        height: 40px;
+        flex: 1 1 auto;
+        min-width: 140px;
+        margin-top: 0;
+        margin-right: 0;
+        font-size: 13px;
+    }
+
+    /* Analytics — single column stack */
+    .analytics {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 16px;
+        margin-left: 0;
+        padding: 0 16px;
+    }
+
+    .revenue {
+        height: 110px;
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .revenue p {
+        font-size: 14px;
+    }
+
+    /* Content rows — single column stack */
+    .content {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-left: 0;
+        margin-top: 16px;
+        padding: 0 16px;
+        margin-bottom: 20px;
+    }
+
+    .overview {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .graph,
+    .secgrapgh,
+    .thirdgrapgh,
+    .upcoming,
+    .top,
+    .tasks {
+        height: 240px;
+        width: 100%;
+    }
+
+    .overview h1 {
+        font-size: 15px;
+    }
+}
+
+
+/* ========================================================================== 
+   FLOATING AI CHATBOT STYLES
+   ========================================================================== */
+
+/* Floating Button (Initial State) */
+.floating-ai-button {
+    position: fixed;
+    bottom: 30px;
+    left: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #822cfb 0%, #964eff 100%);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: white;
+    box-shadow: 0 4px 20px rgba(130, 44, 251, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 998;
+    animation: float 3s ease-in-out infinite;
+}
+
+.floating-ai-button:hover {
+    transform: scale(1.1);
+    box-shadow: 0 8px 30px rgba(130, 44, 251, 0.6);
+}
+
+.floating-ai-button:active {
+    transform: scale(0.95);
+}
+
+.button-label {
+    display: none;
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    background: white;
+    color: #15122f;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+    animation: slideUp 0.3s ease-out;
+}
+
+.floating-ai-button:hover .button-label {
+    display: block;
+}
+
+/* Chatbot Container (Hidden by default) */
+.ai-chatbot-container {
+    position: fixed;
+    bottom: 100px;
+    left: 30px;
+    width: 380px;
+    height: 550px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    pointer-events: none;
+    z-index: 999;
+    border: 1px solid rgba(130, 44, 251, 0.1);
+}
+
+/* Show Chatbot */
+.ai-chatbot-container.active {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: all;
+}
+
+/* Chatbot Header */
+.chatbot-header {
+    background: linear-gradient(135deg, #822cfb 0%, #964eff 100%);
+    color: white;
+    padding: 16px 20px;
+    border-radius: 16px 16px 0 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.chatbot-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chatbot-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.chatbot-close-btn {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.chatbot-close-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Chat Messages Area */
+.chatbot-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+    background: white;
+}
+
+.chatbot-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.chatbot-messages::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb {
+    background: rgba(130, 44, 251, 0.3);
+    border-radius: 3px;
+}
+
+.chatbot-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(130, 44, 251, 0.5);
+}
+
+/* Chat Message Styles */
+.chat-message {
+    display: flex;
+    margin-bottom: 8px;
+    animation: slideUp 0.4s ease-out;
+}
+
+.chat-message.ai-message {
+    justify-content: flex-start;
+}
+
+.chat-message.user-message {
+    justify-content: flex-end;
+}
+
+.message-content {
+    max-width: 80%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    word-wrap: break-word;
+    word-break: break-word;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+.ai-message .message-content {
+    background: rgba(130, 44, 251, 0.1);
+    color: #15122f;
+    border-bottom-left-radius: 4px;
+}
+
+.user-message .message-content {
+    background: linear-gradient(135deg, #822cfb 0%, #964eff 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+/* Typing Indicator */
+.typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 16px;
+    background: rgba(130, 44, 251, 0.1);
+    border-radius: 12px;
+    width: fit-content;
+    animation: slideUp 0.4s ease-out;
+}
+
+.typing-indicator span {
+    width: 8px;
+    height: 8px;
+    background: #822cfb;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+    0%, 60%, 100% {
+        transform: translateY(0);
+        opacity: 0.7;
+    }
+    30% {
+        transform: translateY(-10px);
+        opacity: 1;
+    }
+}
+
+/* Chat Input Area */
+.chatbot-input-area {
+    display: flex;
+    gap: 8px;
+    padding: 16px;
+    background: white;
+    border-top: 1px solid rgba(130, 44, 251, 0.1);
+    border-bottom: 1px solid rgba(130, 44, 251, 0.1);
+}
+
+.chat-input {
+    flex: 1;
+    border: 2px solid rgba(130, 44, 251, 0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 14px;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.3s ease;
+    outline: none;
+    color: #15122f;
+}
+
+.chat-input::placeholder {
+    color: rgba(21, 18, 47, 0.5);
+}
+
+.chat-input:focus {
+    border-color: #822cfb;
+    box-shadow: 0 0 0 3px rgba(130, 44, 251, 0.1);
+}
+
+.chat-send-btn {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #822cfb 0%, #964eff 100%);
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+}
+
+.chat-send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(130, 44, 251, 0.4);
+}
+
+.chat-send-btn:active {
+    transform: translateY(0);
+}
+
+/* Action Buttons */
+.chatbot-actions {
+    padding: 12px 16px;
+    background: white;
+    border-radius: 0 0 16px 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.action-btn {
+    padding: 8px 16px;
+    background: linear-gradient(135deg, #822cfb 0%, #964eff 100%);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 500;
+    font-family: "Poppins", sans-serif;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.action-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(130, 44, 251, 0.4);
+}
+
+.action-btn:active {
+    transform: translateY(0);
+}
+
+/* Floating Animation */
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Slide Up Animation */
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design for Chatbot */
+@media (max-width: 788px) {
+    .ai-chatbot-container {
+        width: 90vw;
+        max-width: 100%;
+        height: 70vh;
+        max-height: 600px;
+        bottom: 90px;
+        left: 5vw;
+        right: 5vw;
+    }
+
+    .floating-ai-button {
+        bottom: 20px;
+        left: 20px;
+        width: 56px;
+        height: 56px;
+        font-size: 20px;
+    }
+
+    .chatbot-header h3 {
+        font-size: 14px;
+    }
+
+    .message-content {
+        max-width: 85%;
+        font-size: 13px;
+    }
+
+    .chat-input {
+        font-size: 13px;
+    }
+
+    .action-btn {
+        font-size: 11px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .ai-chatbot-container {
+        width: calc(100vw - 16px);
+        height: 60vh;
+        bottom: 80px;
+        left: 8px;
+        right: 8px;
+        border-radius: 12px;
+    }
+
+    .floating-ai-button {
+        bottom: 16px;
+        left: 16px;
+        width: 52px;
+        height: 52px;
+        font-size: 18px;
+    }
+
+    .chatbot-messages {
+        padding: 16px;
+    }
+
+    .message-content {
+        max-width: 90%;
+        padding: 10px 14px;
+        font-size: 12px;
+    }
+
+    .chatbot-input-area {
+        gap: 6px;
+        padding: 12px;
+    }
+
+    .chat-input {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .chat-send-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+
+    .chatbot-actions {
+        padding: 10px 12px;
+    }
+
+    .action-btn {
+        font-size: 10px;
+        padding: 5px 10px;
+    }
+}
