@@ -493,6 +493,38 @@ body {
     font-size: 15px;
 }
 
+.revenue-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.revenue-info h2 {
+    margin-left: 10px;
+    margin-top: 12px;
+    color: #111827;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.revenue-change {
+    margin-left: 10px;
+    margin-top: 8px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.revenue-change.profit {
+    color: #15803d;
+}
+
+.revenue-change.loss {
+    color: #dc2626;
+}
+
+.revenue-change.neutral {
+    color: #64748b;
+}
+
 .revenue i {
     background-color: bisque;
     border-radius: 50%;
@@ -546,11 +578,31 @@ body {
 
 }
 
+
+
 .graph {
     background-color: white;
     border-radius: 8px;
-    height: 300px;
+    height: 500px;
     width: 550px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    position: relative;
+}
+
+.graph > h1 {
+    margin: 0 0 5px 0 !important;
+    flex-shrink: 0;
+}
+
+.graph > .enter-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    margin: 0 !important;
+    width: auto;
+    z-index: 10;
 }
 
 .secgrapgh {
@@ -558,6 +610,14 @@ body {
     border-radius: 8px;
     height: 300px;
     width: 420px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+.secgrapgh h1 {
+    margin: 0 0 4px 0 !important;
+    flex-shrink: 0;
 }
 
 .thirdgrapgh {
@@ -1356,5 +1416,316 @@ body {
     .action-btn {
         font-size: 10px;
         padding: 5px 10px;
+    }
+}
+
+/* Chart and Modal Styles */
+.enter-btn {
+    display: inline-block;
+    padding: 8px 18px;
+    font-size: 13px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    white-space: nowrap;
+}
+
+.enter-btn:hover {
+    background-color: #0b7dda;
+}
+
+.chart-container-wrapper {
+    width: 100%;
+    position: relative;
+    height: 260px;
+    margin-top: 0;
+    padding: 10px;
+}
+
+
+
+.chart-container {
+    width: 100%;
+    position: relative;
+    height: 100%;
+    cursor: pointer;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal.active {
+    display: block;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: min(92vw, 460px);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content label {
+    font-weight: bold;
+    display: block;
+    text-decoration: none;
+}
+
+.modal h2 {
+    margin-top: 0;
+    color: #333;
+    text-decoration: none;
+}
+
+.previous-months {
+    background-color: #f5f5f5;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 5px;
+}
+
+.previous-months h4 {
+    margin: 0 0 10px 0;
+}
+
+.month-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 5px 0;
+    border-bottom: 1px solid #ddd;
+}
+
+.month-item:last-child {
+    border-bottom: none;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 12px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.source-inputs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+    margin-top: 15px;
+}
+
+.source-field {
+    min-width: 0;
+}
+
+.revenue-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #eef7ff;
+    border: 1px solid #cfe8ff;
+    border-radius: 6px;
+    padding: 12px 14px;
+    margin: 4px 0 16px;
+    font-size: 15px;
+}
+
+.source-chart-layout {
+    display: grid;
+    grid-template-columns: minmax(150px, 180px) minmax(150px, 180px);
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+}
+
+.source-percentages {
+    display: grid;
+    align-content: center;
+    justify-content: center;
+    gap: 13px;
+    height: 100%;
+    min-width: 0;
+    width: 100%;
+}
+
+.source-percent-row {
+    display: grid;
+    grid-template-columns: 11px minmax(0, 1fr);
+    align-items: start;
+    gap: 10px;
+    color: #111827;
+    animation: sourceFadeIn 0.35s ease both;
+}
+
+.source-percent-row span:not(.source-dot) {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.source-percent-row strong {
+    display: block;
+    color: #64748b;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.source-dot {
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    margin-top: 3px;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.06);
+}
+
+.source-chart-wrapper {
+    height: 180px;
+    min-width: 0;
+    width: 100%;
+    max-width: 180px;
+    justify-self: center;
+    align-self: center;
+    filter: drop-shadow(0 10px 16px rgba(15, 23, 42, 0.12));
+}
+
+@keyframes sourceFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.modal-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.modal-buttons button {
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.btn-save {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.btn-save:hover {
+    background-color: #45a049;
+}
+
+.btn-back {
+    background-color: #eef2f7;
+    color: #333;
+}
+
+.btn-back:hover {
+    background-color: #dfe6ef;
+}
+
+.btn-cancel {
+    background-color: #f44336;
+    color: white;
+}
+
+.btn-cancel:hover {
+    background-color: #da190b;
+}
+
+.months-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.month-btn {
+    padding: 15px;
+    background-color: #f0f0f0;
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.month-btn:hover {
+    background-color: #2196F3;
+    color: white;
+    border-color: #2196F3;
+}
+
+@media (max-width: 520px) {
+    .modal-content {
+        margin: 7% auto;
+        padding: 16px;
+    }
+
+    .source-inputs,
+    .months-list {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-buttons button {
+        flex: 1 1 100px;
+    }
+
+    .source-chart-layout {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        gap: 12px;
+    }
+
+    .source-percentages {
+        height: auto;
+        max-width: 220px;
+        justify-self: center;
+    }
+
+    .source-chart-wrapper {
+        height: 150px;
+        max-width: 150px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .secgrapgh {
+        height: auto;
+        min-height: 300px;
     }
 }

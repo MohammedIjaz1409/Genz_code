@@ -78,8 +78,21 @@ Failure : All my div Boxes become invisible and doesnt make reponsive.
 
 ## PROMPT 2
 
-Create a modern floating AI chatbot that appears at the bottom-left corner when the AI Assistant button is clicked. The chatbot should have a compact size , smooth open/close animations, a header with an AI icon and close button, a scrollable chat area, message input field, Send and Submit buttons, typing indicator animation, and a professional  design. The chatbot should be responsive,  defaultly hidden , and open/close with smooth transitions.the AI chatbot should not hide any element and the colour should be white , matching colors with website
+Create a modern floating AI chatbot that appears at the bottom-left corner when the AI Assistant button is clicked. The chatbot should have a compact size , smooth open/close animations, a header with an AI icon and close button, a scrollable chat area, message input field, Send and Submit buttons, typing indicator animation, and a professional  design. The chatbot should be responsive,  defaultly hidden , and open/close with smooth transitions.the AI chatbot should not hide any element and the colour should be white , matching colors with website.
 
+## 19 JUNE 2026
+
+## PROMPT 1
+
+In enter revenue button - near grapgh , add revenue source - Youtube , Instagram ,Collaborations and Other , total should be done and shown , submit and cancel button also to be shown , don't change existing code that are not required ,clean , responsive UI design , as a pie chart , shows percentage , total , padding is 10px ,the percentage should be showed in the right side center , the pie chart should be realistic and with nice ui animations and real colors violet , pink ,light blue and yellow for following youtube , instagram , collobrations , others, the pie chart should be continuous with total inside the pie chart. , should be placed left side . the total should be included inside the source by revenue and padding should be 10px 
+
+result:Implemented code successfully without any problem.
+
+## PROMPT 2
+
+when i enter my revenue in my graph , also needed to be stored in the revenue total div with darker font and should show the percentage of profit or loss , revenue . the profit percentage should be shown in green  , same for loss red color .compare the revenue btw two months , current month and previous month and show percentage
+
+result: Implemented code successfully without any problem.
 
 
 

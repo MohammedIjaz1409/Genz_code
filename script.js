@@ -178,3 +178,391 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+
+
+
+
+
+
+
+
+//
+
+ 
+        // Monthly Revenue Chart Script
+        const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                        'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const revenueSources = ['youtube', 'instagram', 'collaborations', 'other'];
+        const sourceLabels = {
+            youtube: 'Youtube',
+            instagram: 'Instagram',
+            collaborations: 'Collaborations',
+            other: 'Other'
+        };
+        const sourceColors = {
+            youtube: '#6d28d9',
+            instagram: '#ec4899',
+            collaborations: '#60a5fa',
+            other: '#fbbf24'
+        };
+        const sourceColorEnds = {
+            youtube: '#7c3aed',
+            instagram: '#f43f5e',
+            collaborations: '#3b82f6',
+            other: '#f59e0b'
+        };
+        const monthlyData = new Array(12).fill(0);
+        const monthlySourceData = Array.from({ length: 12 }, () => ({
+            youtube: 0,
+            instagram: 0,
+            collaborations: 0,
+            other: 0
+        }));
+        let selectedMonth = -1;
+        let chart;
+        let sourceChart;
+        let sourceGrandTotal = 0;
+        const sourceCenterTextPlugin = {
+            id: 'sourceCenterText',
+            afterDraw(chart) {
+                if (chart.canvas.id !== 'sourcePieChart') return;
+
+                const { ctx, chartArea } = chart;
+                const x = (chartArea.left + chartArea.right) / 2;
+                const y = (chartArea.top + chartArea.bottom) / 2;
+
+                ctx.save();
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillStyle = '#020617';
+                ctx.font = '700 22px Poppins, sans-serif';
+                ctx.fillText(`$${sourceGrandTotal.toLocaleString()}`, x, y - 8);
+                ctx.fillStyle = '#64748b';
+                ctx.font = '500 13px Poppins, sans-serif';
+                ctx.fillText('Total', x, y + 18);
+                ctx.restore();
+            }
+        };
+
+        // Initialize when page loads
+        window.addEventListener('load', function() {
+            initChart();
+            setupEventListeners();
+        });
+
+        function initChart() {
+            const ctx = document.getElementById('revenueChart');
+            if (ctx) {
+                chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: months,
+                        datasets: [{
+                            label: 'Revenue',
+                            data: monthlyData,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            }
+
+            const sourceCtx = document.getElementById('sourcePieChart');
+            if (sourceCtx) {
+                const sourcePieContext = sourceCtx.getContext('2d');
+                const sourceGradients = revenueSources.map(source => {
+                    const gradient = sourcePieContext.createLinearGradient(0, 0, 180, 180);
+                    gradient.addColorStop(0, sourceColors[source]);
+                    gradient.addColorStop(1, sourceColorEnds[source]);
+                    return gradient;
+                });
+
+                sourceChart = new Chart(sourceCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Youtube', 'Instagram', 'Collaborations', 'Other'],
+                        datasets: [{
+                            data: [0, 0, 0, 0],
+                            backgroundColor: sourceGradients,
+                            hoverBackgroundColor: revenueSources.map(source => sourceColors[source]),
+                            borderWidth: 0,
+                            hoverOffset: 10,
+                            spacing: 0
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '58%',
+                        animation: {
+                            animateRotate: true,
+                            animateScale: true,
+                            duration: 900,
+                            easing: 'easeOutQuart'
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((sum, item) => sum + item, 0);
+                                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                                        return `${context.label}: $${value} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    plugins: [sourceCenterTextPlugin]
+                });
+            }
+        }
+
+        function setupEventListeners() {
+            // Enter Revenue button
+            const enterRevenueBtn = document.getElementById('enterRevenueBtn');
+            if (enterRevenueBtn) {
+                enterRevenueBtn.addEventListener('click', openMonthsModal);
+            }
+            
+            // Close modal when clicking outside
+            const modal = document.getElementById('modal');
+            if (modal) {
+                modal.addEventListener('click', function(event) {
+                    if (event.target === this) {
+                        closeModal();
+                    }
+                });
+            }
+            
+            document.querySelectorAll('.source-input').forEach(input => {
+                input.addEventListener('input', updateRevenueTotal);
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        saveRevenue();
+                    }
+                });
+            });
+
+            updateSourceChart();
+        }
+
+        function openMonthsModal() {
+            const monthsList = document.getElementById('monthsList');
+            if (monthsList) {
+                monthsList.innerHTML = '';
+                
+                months.forEach((month, index) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'month-btn';
+                    btn.textContent = month;
+                    btn.onclick = () => selectMonth(index);
+                    monthsList.appendChild(btn);
+                });
+            }
+            
+            const monthsView = document.getElementById('monthsView');
+            const revenueView = document.getElementById('revenueView');
+            const modal = document.getElementById('modal');
+            
+            if (monthsView) monthsView.style.display = 'block';
+            if (revenueView) revenueView.style.display = 'none';
+            if (modal) modal.classList.add('active');
+        }
+
+        function selectMonth(monthIndex) {
+            selectedMonth = monthIndex;
+            const monthName = months[monthIndex];
+            const modalMonth = document.getElementById('modalMonth');
+            
+            if (modalMonth) modalMonth.textContent = monthName;
+            revenueSources.forEach(source => {
+                const input = document.getElementById(`${source}Revenue`);
+                if (input) input.value = monthlySourceData[monthIndex][source] || '';
+            });
+            updateRevenueTotal();
+            
+            // Show previous months
+            let previousHTML = '';
+            if (monthIndex > 0) {
+                previousHTML += '<h4>Previous Months:</h4>';
+                for (let i = 0; i < monthIndex; i++) {
+                    if (monthlyData[i] > 0) {
+                        previousHTML += `<div class="month-item"><span>${months[i]}</span><strong>$${monthlyData[i]}</strong></div>`;
+                    }
+                }
+            }
+            const previousMonths = document.getElementById('previousMonths');
+            if (previousMonths) previousMonths.innerHTML = previousHTML;
+            
+            const monthsView = document.getElementById('monthsView');
+            const revenueView = document.getElementById('revenueView');
+            
+            if (monthsView) monthsView.style.display = 'none';
+            if (revenueView) revenueView.style.display = 'block';
+            const youtubeInput = document.getElementById('youtubeRevenue');
+            if (youtubeInput) youtubeInput.focus();
+        }
+
+        function backToMonths() {
+            const monthsView = document.getElementById('monthsView');
+            const revenueView = document.getElementById('revenueView');
+            
+            if (monthsView) monthsView.style.display = 'block';
+            if (revenueView) revenueView.style.display = 'none';
+            selectedMonth = -1;
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('modal');
+            const monthsView = document.getElementById('monthsView');
+            const revenueView = document.getElementById('revenueView');
+            
+            if (modal) modal.classList.remove('active');
+            if (monthsView) monthsView.style.display = 'block';
+            if (revenueView) revenueView.style.display = 'none';
+            selectedMonth = -1;
+        }
+
+        function updateRevenueTotal() {
+            const total = revenueSources.reduce((sum, source) => {
+                const input = document.getElementById(`${source}Revenue`);
+                return sum + (Number(input?.value) || 0);
+            }, 0);
+            const revenueTotal = document.getElementById('revenueTotal');
+            if (revenueTotal) revenueTotal.textContent = `$${total}`;
+            return total;
+        }
+
+        function updateSourceChart() {
+            const totals = revenueSources.reduce((summary, source) => {
+                summary[source] = monthlySourceData.reduce((sum, month) => sum + month[source], 0);
+                return summary;
+            }, {});
+            const sourceValues = revenueSources.map(source => totals[source]);
+            const grandTotal = sourceValues.reduce((sum, value) => sum + value, 0);
+            const sourcePercentages = document.getElementById('sourcePercentages');
+
+            sourceGrandTotal = grandTotal;
+            if (sourcePercentages) {
+                sourcePercentages.innerHTML = revenueSources.map(source => {
+                    const percentage = grandTotal > 0 ? ((totals[source] / grandTotal) * 100).toFixed(1) : '0.0';
+                    return `
+                        <div class="source-percent-row">
+                            <span class="source-dot" style="background-color: ${sourceColors[source]}"></span>
+                            <div>
+                                <span>${sourceLabels[source]}</span>
+                                <strong>$${totals[source].toLocaleString()} (${percentage}%)</strong>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            if (sourceChart) {
+                sourceChart.data.datasets[0].data = grandTotal > 0 ? sourceValues : [1, 1, 1, 1];
+                sourceChart.update();
+            }
+        }
+
+        function updateTotalRevenueCard(monthIndex) {
+            const totalRevenueValue = document.getElementById('totalRevenueValue');
+            const revenueChange = document.getElementById('revenueChange');
+            const currentRevenue = monthlyData[monthIndex] || 0;
+            const previousRevenue = monthIndex > 0 ? monthlyData[monthIndex - 1] || 0 : 0;
+            const currentMonthName = months[monthIndex] || 'Current month';
+            const previousMonthName = monthIndex > 0 ? months[monthIndex - 1] : 'previous month';
+
+            if (totalRevenueValue) {
+                totalRevenueValue.textContent = `$${currentRevenue.toLocaleString()}`;
+            }
+
+            if (!revenueChange) return;
+
+            revenueChange.classList.remove('profit', 'loss', 'neutral');
+
+            if (previousRevenue === 0) {
+                revenueChange.textContent = `${currentMonthName} vs ${previousMonthName}: 0%`;
+                revenueChange.classList.add('neutral');
+                return;
+            }
+
+            const changePercentage = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+            const roundedChange = Math.abs(changePercentage).toFixed(1);
+
+            if (changePercentage > 0) {
+                revenueChange.textContent = `${currentMonthName} vs ${previousMonthName}: +${roundedChange}% profit`;
+                revenueChange.classList.add('profit');
+            } else if (changePercentage < 0) {
+                revenueChange.textContent = `${currentMonthName} vs ${previousMonthName}: -${roundedChange}% loss`;
+                revenueChange.classList.add('loss');
+            } else {
+                revenueChange.textContent = `${currentMonthName} vs ${previousMonthName}: 0%`;
+                revenueChange.classList.add('neutral');
+            }
+        }
+
+        function saveRevenue() {
+            if (selectedMonth < 0) return;
+
+            revenueSources.forEach(source => {
+                const input = document.getElementById(`${source}Revenue`);
+                monthlySourceData[selectedMonth][source] = Number(input?.value) || 0;
+            });
+            monthlyData[selectedMonth] = updateRevenueTotal();
+            if (chart) {
+                chart.update();
+            }
+            updateSourceChart();
+            updateTotalRevenueCard(selectedMonth);
+            closeModal();
+        }
+
+
+
+        // API connection//
+
+async function sendMessage(){
+
+    let input = document.getElementById("userInput").value;
+
+    let response = await fetch(
+        "http://127.0.0.1:5000/chat",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                message: input
+            })
+        }
+    );
+
+    let data = await response.json();
+
+    document.getElementById("chatBox").innerHTML +=
+    `
+    <p>You: ${input}</p>
+    <p>AI: ${data.reply || data.error}</p>
+    `;
+}

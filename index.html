@@ -17,6 +17,7 @@
    
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <title>AI Creator Business Manager|In single platform</title>
 </head>
@@ -75,7 +76,12 @@
 
     <div class="analytics">
         <div class="revenue total">
-            <p>Total Revenue</p> <i class="fa-solid fa-dollar-sign" style="color: rgb(0, 0, 0);"></i>
+            <div class="revenue-info">
+                <p>Total Revenue</p>
+                <h2 id="totalRevenueValue">$0</h2>
+                <span id="revenueChange" class="revenue-change neutral">0% vs previous month</span>
+            </div>
+            <i class="fa-solid fa-dollar-sign" style="color: rgb(0, 0, 0);"></i>
 
         </div>
 
@@ -99,11 +105,67 @@
 
     <div class="content">
         <div class="overview graph">
-            <h1>Revenue Overview</h1>
+            <h1>Monthly Revenue Chart</h1>
+            <button id="enterRevenueBtn" class="enter-btn">Enter Revenue</button>
+            <div class="chart-container-wrapper">
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+
+            <div id="modal" class="modal">
+                <div class="modal-content">
+                    <div id="monthsView">
+                        <h2>Select a Month</h2>
+                        <div id="monthsList" class="months-list"></div>
+                    </div>
+                    
+                    <div id="revenueView" style="display: none;">
+                        <h2>Enter Revenue for <span id="modalMonth"></span></h2>
+                        <div class="previous-months" id="previousMonths"></div>
+                        <div class="source-inputs">
+                            <div class="source-field">
+                                <label for="youtubeRevenue">Youtube</label>
+                                <input type="number" id="youtubeRevenue" class="modal-input source-input" min="0" placeholder="0">
+                            </div>
+
+                            <div class="source-field">
+                                <label for="instagramRevenue">Instagram</label>
+                                <input type="number" id="instagramRevenue" class="modal-input source-input" min="0" placeholder="0">
+                            </div>
+
+                            <div class="source-field">
+                                <label for="collaborationsRevenue">Collaborations</label>
+                                <input type="number" id="collaborationsRevenue" class="modal-input source-input" min="0" placeholder="0">
+                            </div>
+
+                            <div class="source-field">
+                                <label for="otherRevenue">Other</label>
+                                <input type="number" id="otherRevenue" class="modal-input source-input" min="0" placeholder="0">
+                            </div>
+                        </div>
+                        <div class="revenue-total">
+                            <span>Total</span>
+                            <strong id="revenueTotal">$0</strong>
+                        </div>
+                        <div class="modal-buttons">
+                            <button class="btn-back" onclick="backToMonths()">Back</button>
+                            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+                            <button class="btn-save" onclick="saveRevenue()">Submit</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="overview secgrapgh">
             <h1>Revenue by Source</h1>
+            <div class="source-chart-layout">
+                <div class="source-chart-wrapper">
+                    <canvas id="sourcePieChart"></canvas>
+                </div>
+                <div id="sourcePercentages" class="source-percentages"></div>
+            </div>
         </div>
 
         <div class="overview thirdgrapgh">
@@ -133,6 +195,16 @@
 
     <!-- Floating AI Chatbot -->
     <div class="ai-chatbot-container" id="aiChatbot">
+    <!-- API  -->
+        <input id="userInput" placeholder="Ask your business question">
+
+<button onclick="sendMessage()">
+Send
+</button>
+
+<!-- completed api input -->
+
+<div id="chatBox"></div>
         <!-- Chatbot Header -->
         <div class="chatbot-header">
             <div class="chatbot-header-content">
@@ -189,6 +261,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+   
     <script src="script.js"></script>
 </body>
 
