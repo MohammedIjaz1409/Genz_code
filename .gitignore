@@ -1,1 +1,15 @@
 .env
+
+.venv/
+venv/
+.env
+.vscode/
+__pycache__/
+*.pyc
+
+.venv/
+.env
+__pycache__/
+.DS_Store
+
+echo ".venv/" >> .gitignore

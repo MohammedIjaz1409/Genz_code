@@ -94,6 +94,130 @@ when i enter my revenue in my graph , also needed to be stored in the revenue to
 
 result: Implemented code successfully without any problem.
 
+## 20 JUNE 2026
+
+### Prompt 1
+
+create app.py and install flask and generate a code to connect API from openrouter.com client is openai , also the backend ;python should be connected to frontened;HTML , CSS ,JS . the API is for AI assistant ;chatbox . set max-tokens 1000 .
+
+
+### Prompt 2
+
+Act as an expert frontend developer and UI/UX designer. I need you to build a "Tasks and Reminders" component using modern, clean, UI desgn.
+Here is the exact functionality and layout I need:
+
+The Main View:
+   A dedicated container/div titled "Tasks & Reminders". It should display tasks as a numbered list.
+ By default, only the top 3 tasks should be visible.
+   Below the third task, there must be a "Show More" / "View All" button that expands or lists down the remaining tasks when clicked.
+
+ The "+ New Tasks and Reminder" Button:
+   Place a prominent, stylish action button at the top or bottom of the main view.
+    Clicking this button opens a small popup/modal page.
+
+The Popup Form:
+   
+      Task Title (Input field)
+      Reminder Details/Notes (Textarea or input field)
+      Completion Date (Date picker)
+   Action Buttons: A "Submit" button and a "Cancel" button.
+   Behavior:The popup should NOT automatically hide or close unexpectedly; it should stay open until the user explicitly clicks "Submit" or "Cancel".
+
+
+ When the user fills out the form and clicks "Submit", the entered data must instantly sent to the main "Tasks & Reminders", listed in numbered list.
+
+ UI/UX Design Requirements:
+   Use a modern, professional, and eye-catching color palette.
+   Use smooth transitions/animations for opening the popup and expanding the task list.
+   
+provide the complete, clean, and well-commented code (HTML/CSS/JS).
+
+
+### promt 3 
+
+show only 3 tasks and the height of the task & remainder div is equal to the div in the same the row . , show the tasks in a small -medium sized. when i click see more , the tasks div should adjust and becomes small as possible and then extend .
+
+
+### Promt 4
+
+In the enter revenue button ,add : No of brand deals(shown only when clicked)  , for all month, the entered value in the brand deals is directed or shown in the Brand Deals div , which has same font size and font wieght as there in revenue div .
+
+### prompt 5 
+when no of deals entered , it should not disappear , once closed and opened again , i need a button remove , that removes all the value entered.
+
+## prompt 6
+
+
+
+
+Analyze creator data:
+Followers
+Engagement rate
+Views
+Audience demographics
+Content nichePrevious brand deals
+
+Revenue data
+ Create an AI recommendation engine that provides:
+Best brand categories to approach
+Potential sponsorship opportunities
+Revenue growth ideas
+Content improvement suggestions
+Pricing suggestions for collaborations
+Audience growth strategies
+ The AI output should include:
+Recommendation title
+Reason behind recommendation
+Expected impact
+Priority level (High/Medium/Low)
+Action steps
+ Integrate it into the existing frontend:
+Add a recommendation section/card
+Display AI-generated suggestions dynamically
+Keep the current UI design unchanged
+Make it responsive for mobile, tablet, and desktop
+ Backend:
+Connect the AI model API
+Create an endpoint for recommendations
+Send creator data as input
+Return structured JSON response
+ Code requirements:
+Do not rewrite existing files unnecessarily
+Modify only required files
+Keep code clean and commented
+Make sure existing features continue working
+
+Input example:
+topic: "Gaming",
+
+ followers: 50000,
+
+ engagement: "8%",
+
+ avgViews: 20000,
+
+ audience: "18-24",
+
+ previousDeals: ["Gaming accessories"],
+
+ revenue: 3000
+
+
+
+Output example:
+
+
+
+ recommendation: "Partner with gaming hardware brands",
+
+ reason: "Your audience matches gaming product buyers",
+
+ impact: "Increase sponsorship revenue",
+
+ priority: "High",
+
+ action: "Contact keyboard, mouse and PC brands"
+
 
 
 

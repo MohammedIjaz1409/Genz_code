@@ -86,12 +86,8 @@
         </div>
 
         <div class="revenue brand">
-            <div class="revenue-info">
-                <p>Brand Deals</p>
-                <h2 id="brandDealsValue">0</h2>
-                <span id="brandDealsChange" class="revenue-change neutral">0 deals this month</span>
-            </div>
-            <i class="fa-regular fa-handshake" style="color: rgb(0, 0, 0);"></i>
+            <p>Brand Deals</p> <i class="fa-regular fa-handshake" style="color: rgb(0, 0, 0);"></i>
+
         </div>
 
 
@@ -147,19 +143,6 @@
                                 <label for="otherRevenue">Other</label>
                                 <input type="number" id="otherRevenue" class="modal-input source-input" min="0" placeholder="0">
                             </div>
-
-                            <div class="source-field brand-deals-toggle-container" style="grid-column: 1 / -1; display: flex; justify-content: center; margin-top: 10px;">
-                                <button type="button" id="toggleBrandDealsInputBtn" class="btn-toggle-brand-deals" style="background: none; border: none; color: #822cfb; cursor: pointer; font-size: 12px; font-weight: 600; font-family: 'Poppins', sans-serif; display: flex; align-items: center; gap: 4px;">
-                                    <i class="fa-solid fa-plus"></i> Add Brand Deals count
-                                </button>
-                            </div>
-                            <div class="source-field" id="brandDealsInputContainer" style="display: none; grid-column: 1 / -1; margin-top: 8px;">
-                                <label for="brandDealsCount" style="display: block; font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 4px;">No. of Brand Deals</label>
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <input type="number" id="brandDealsCount" class="modal-input" min="0" placeholder="0" style="flex: 1; box-sizing: border-box; padding: 10px 14px; border: 1.5px solid #cbd5e1; border-radius: 8px; outline: none; font-family: 'Poppins', sans-serif; font-size: 13px; color: #1e293b;">
-                                    <button type="button" id="removeBrandDealsBtn" title="Remove brand deals count" style="background: #fee2e2; border: none; color: #dc2626; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600; white-space: nowrap; display: flex; align-items: center; gap: 5px; transition: background 0.2s;"><i class="fa-solid fa-trash-can"></i> Remove</button>
-                                </div>
-                            </div>
                         </div>
                         <div class="revenue-total">
                             <span>Total</span>
@@ -186,54 +169,7 @@
         </div>
 
         <div class="overview thirdgrapgh">
-            <div class="ai-rec-header">
-                <h1>AI Business Recommendation</h1>
-                <button id="getRecsBtn" class="get-recs-btn">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
-                </button>
-            </div>
-
-            <!-- Creator Profile Form -->
-            <div class="rec-profile-form" id="recProfileForm">
-                <div class="rec-form-grid">
-                    <div class="rec-field">
-                        <label for="recNiche">Niche / Category</label>
-                        <input type="text" id="recNiche" placeholder="e.g. Gaming, Beauty, Tech" />
-                    </div>
-                    <div class="rec-field">
-                        <label for="recFollowers">Total Followers</label>
-                        <input type="number" id="recFollowers" placeholder="e.g. 50000" min="0" />
-                    </div>
-                    <div class="rec-field">
-                        <label for="recEngagement">Engagement Rate</label>
-                        <input type="text" id="recEngagement" placeholder="e.g. 8%" />
-                    </div>
-                    <div class="rec-field">
-                        <label for="recAvgViews">Avg. Views per Post</label>
-                        <input type="number" id="recAvgViews" placeholder="e.g. 20000" min="0" />
-                    </div>
-                    <div class="rec-field">
-                        <label for="recAudience">Audience Age Group</label>
-                        <input type="text" id="recAudience" placeholder="e.g. 18-24, 25-34" />
-                    </div>
-                    <div class="rec-field">
-                        <label for="recContentType">Content Type</label>
-                        <input type="text" id="recContentType" placeholder="e.g. Short-form, Long-form, Reels" />
-                    </div>
-                    <div class="rec-field rec-field-full">
-                        <label for="recPrevDeals">Previous Brand Deals</label>
-                        <input type="text" id="recPrevDeals" placeholder="e.g. Gaming accessories, Fashion brands" />
-                    </div>
-                </div>
-            </div>
-
-            <!-- Output Area -->
-            <div class="rec-output" id="recOutput">
-                <div class="rec-placeholder">
-                    <i class="fa-solid fa-robot"></i>
-                    <p>Fill in your creator profile and click <strong>Get Recommendations</strong> to receive personalised AI-powered business insights.</p>
-                </div>
-            </div>
+            <h1>AI Buisness Recommendation</h1>
         </div>
     </div>
 
@@ -247,17 +183,7 @@
         </div>
 
         <div class="overview tasks">
-            <div class="tasks-header">
-                <h1>Tasks & Reminders</h1>
-                <span class="task-count" id="taskCount">0 Tasks</span>
-            </div>
-            <div class="task-list-wrapper">
-                <ol class="task-list" id="taskList"></ol>
-            </div>
-            <div class="tasks-footer">
-                <button id="showMoreTasksBtn" class="show-more-btn" style="display: none;">Show More</button>
-                <button id="addTaskBtn" class="add-task-btn"><i class="fa-solid fa-plus"></i> Add Task</button>
-            </div>
+            <h1>Tasks & Remainders</h1>
         </div>
     </div>
 
@@ -271,7 +197,7 @@
 
 <!-- completed api input -->
 
-<div id="chatBox" class="ai-chatbot-container">
+<div id="chatBox"></div>
         <!-- Chatbot Header -->
         <div class="chatbot-header">
             <div class="chatbot-header-content">
@@ -326,37 +252,6 @@
         <i class="fa-solid fa-robot"></i>
         <span class="button-label">AI Assistant</span>
     </div>
-
-    <!-- Tasks & Reminders Modal Dialog -->
-    <dialog id="taskDialog" class="task-modal">
-        <div class="task-modal-content">
-            <div class="task-modal-header">
-                <h2><i class="fa-solid fa-calendar-check" style="color: #822cfb; margin-right: 8px;"></i>New Task & Reminder</h2>
-                <button id="closeTaskDialogBtn" class="close-btn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <form id="taskForm" method="dialog" class="task-form">
-                <div class="form-group">
-                    <label for="taskTitle">Task Title</label>
-                    <input type="text" id="taskTitle" name="title" required placeholder="What needs to be done?">
-                </div>
-                <div class="form-group">
-                    <label for="taskNotes">Reminder Details / Notes</label>
-                    <textarea id="taskNotes" name="notes" placeholder="Add some details or description..." rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="taskDueDate">Completion Date</label>
-                    <div class="date-picker-wrapper">
-                        <i class="fa-regular fa-calendar input-icon"></i>
-                        <input type="text" id="taskDueDate" name="dueDate" placeholder="Select deadline date" required>
-                    </div>
-                </div>
-                <div class="modal-footer-buttons">
-                    <button type="button" id="cancelTaskBtn" class="btn-secondary">Cancel</button>
-                    <button type="submit" id="submitTaskBtn" class="btn-primary">Submit</button>
-                </div>
-            </form>
-        </div>
-    </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
    

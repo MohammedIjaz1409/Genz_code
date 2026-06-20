@@ -27,6 +27,7 @@ flatpickr("#daterange", {
 });
 
 
+
 /* ========================================================================== 
    FLOATING AI CHATBOT FUNCTIONALITY
    ========================================================================== */
@@ -35,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Get DOM elements
     const floatingButton = document.getElementById('floatingButton');
     const assistantButton = document.getElementById('assistant');
-    const aiChatbot = document.getElementById('aiChatbot');
+    const aiChatbot = document.querySelector('.chatbot-header').parentElement;
     const chatbotCloseBtn = document.getElementById('chatbotCloseBtn');
     const chatInput = document.getElementById('chatInput');
     const chatSendBtn = document.getElementById('chatSendBtn');
@@ -78,6 +79,28 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 100);
     }
 
+    // Format basic Markdown and escapes HTML
+    function formatMessageText(text) {
+        let html = text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+            
+        // Bold: **text** -> <strong>text</strong>
+        html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Italic: *text* -> <em>text</em>
+        html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+        
+        // Code: `code` -> <code>$1</code>
+        html = html.replace(/`(.*?)`/g, '<code>$1</code>');
+        
+        // Newlines: \n -> <br>
+        html = html.replace(/\n/g, '<br>');
+        
+        return html;
+    }
+
     // Add message to chat
     function addMessage(text, isUser = false) {
         const messageDiv = document.createElement('div');
@@ -85,7 +108,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const contentDiv = document.createElement('div');
         contentDiv.className = 'message-content';
-        contentDiv.textContent = text;
+        
+        if (isUser) {
+            contentDiv.textContent = text;
+        } else {
+            contentDiv.innerHTML = formatMessageText(text);
+        }
         
         messageDiv.appendChild(contentDiv);
         chatMessages.appendChild(messageDiv);
@@ -132,6 +160,12 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (messageText === '') return;
 
+        // Trigger send button flyOut animation
+        chatSendBtn.classList.add('clicked');
+        setTimeout(() => {
+            chatSendBtn.classList.remove('clicked');
+        }, 600);
+
         // Add user message
         addMessage(messageText, true);
         chatInput.value = '';
@@ -139,12 +173,56 @@ document.addEventListener('DOMContentLoaded', () => {
         // Show typing indicator
         showTyping();
 
-        // Simulate AI thinking time
-        setTimeout(() => {
+        // Gather live business data from dashboard state safely
+        let businessData = null;
+        try {
+            if (typeof monthlyData !== 'undefined' && typeof monthlySourceData !== 'undefined' && typeof months !== 'undefined') {
+                businessData = {
+                    totalRevenue: document.getElementById('totalRevenueValue')?.textContent || '$0',
+                    monthlyTrend: months.map((m, i) => `${m}: $${monthlyData[i] || 0}`).join(', '),
+                    sources: {
+                        youtube: monthlySourceData.reduce((sum, m) => sum + (m.youtube || 0), 0),
+                        instagram: monthlySourceData.reduce((sum, m) => sum + (m.instagram || 0), 0),
+                        collaborations: monthlySourceData.reduce((sum, m) => sum + (m.collaborations || 0), 0),
+                        other: monthlySourceData.reduce((sum, m) => sum + (m.other || 0), 0)
+                    }
+                };
+            }
+        } catch (e) {
+            console.error('Error gathering dashboard data:', e);
+        }
+
+        // Determine correct backend API URL dynamically
+        const backendUrl = window.location.protocol.startsWith('http') 
+            ? '/api/chat' 
+            : 'http://127.0.0.1:5000/api/chat';
+
+        // Fetch response from Flask backend
+        fetch(backendUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
+                message: messageText,
+                businessData: businessData
+            })
+        })
+        .then(response => response.json().then(data => ({ status: response.status, data })))
+        .then(({ status, data }) => {
             hideTyping();
-            const aiResponse = getAIResponse(messageText);
-            addMessage(aiResponse, false);
-        }, 800 + Math.random() * 600);
+            if (status === 200 && data.response) {
+                addMessage(data.response, false);
+            } else {
+                const errMsg = data.message || data.error || 'Something went wrong. Please check your backend logs.';
+                addMessage(`❌ Error: ${errMsg}`, false);
+            }
+        })
+        .catch(error => {
+            hideTyping();
+            console.error('Fetch error:', error);
+            addMessage('❌ Error: Could not connect to the AI assistant backend. Please ensure the Flask server is running on port 5000.', false);
+        });
     }
 
     // Event listeners
@@ -153,10 +231,27 @@ document.addEventListener('DOMContentLoaded', () => {
     chatbotCloseBtn.addEventListener('click', closeChatbot);
     chatSendBtn.addEventListener('click', sendMessage);
     submitBtn.addEventListener('click', () => {
+        if (submitBtn.classList.contains('success')) return;
+
+        // Trigger success animation
+        submitBtn.classList.add('success');
+        submitBtn.disabled = true;
+        
+        const originalContent = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Submitted!';
+        
         addMessage('✓ Form submitted successfully! We\'ll be in touch soon.', false);
+        
         setTimeout(() => {
             chatInput.value = '';
         }, 300);
+
+        // Reset button state after 2 seconds
+        setTimeout(() => {
+            submitBtn.classList.remove('success');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalContent;
+        }, 2000);
     });
 
     // Allow sending message with Enter key
@@ -216,7 +311,8 @@ document.addEventListener('DOMContentLoaded', () => {
             youtube: 0,
             instagram: 0,
             collaborations: 0,
-            other: 0
+            other: 0,
+            brandDeals: 0
         }));
         let selectedMonth = -1;
         let chart;
@@ -364,6 +460,43 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
 
+            // Toggle Brand Deals Input in Enter Revenue Modal
+            const toggleBrandDealsInputBtn = document.getElementById('toggleBrandDealsInputBtn');
+            const brandDealsInputContainer = document.getElementById('brandDealsInputContainer');
+            if (toggleBrandDealsInputBtn && brandDealsInputContainer) {
+                toggleBrandDealsInputBtn.addEventListener('click', () => {
+                    const isHidden = brandDealsInputContainer.style.display === 'none';
+                    if (isHidden) {
+                        brandDealsInputContainer.style.display = 'block';
+                        toggleBrandDealsInputBtn.innerHTML = '<i class="fa-solid fa-minus"></i> Hide Brand Deals count';
+                        const brandDealsCountInput = document.getElementById('brandDealsCount');
+                        if (brandDealsCountInput) brandDealsCountInput.focus();
+                    } else {
+                        brandDealsInputContainer.style.display = 'none';
+                        toggleBrandDealsInputBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Brand Deals count';
+                    }
+                });
+            }
+
+            // Remove Brand Deals button
+            const removeBrandDealsBtn = document.getElementById('removeBrandDealsBtn');
+            if (removeBrandDealsBtn) {
+                removeBrandDealsBtn.addEventListener('click', () => {
+                    const brandDealsCountInput = document.getElementById('brandDealsCount');
+                    if (brandDealsCountInput) brandDealsCountInput.value = '';
+                    // Immediately persist the cleared value so it stays gone
+                    if (selectedMonth >= 0) {
+                        monthlySourceData[selectedMonth].brandDeals = 0;
+                        updateBrandDealsCard(selectedMonth);
+                    }
+                    // Hide the container and reset toggle button
+                    const brandDealsContainer = document.getElementById('brandDealsInputContainer');
+                    const toggleBtn = document.getElementById('toggleBrandDealsInputBtn');
+                    if (brandDealsContainer) brandDealsContainer.style.display = 'none';
+                    if (toggleBtn) toggleBtn.innerHTML = '<i class="fa-solid fa-plus"></i> Add Brand Deals count';
+                });
+            }
+
             updateSourceChart();
         }
 
@@ -373,11 +506,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 monthsList.innerHTML = '';
                 
                 months.forEach((month, index) => {
+                    const hasData = monthlyData[index] > 0;
+
+                    // Wrapper row
+                    const row = document.createElement('div');
+                    row.className = 'month-row';
+
+                    // Month select button
                     const btn = document.createElement('button');
-                    btn.className = 'month-btn';
+                    btn.className = `month-btn${hasData ? ' has-data' : ''}`;
                     btn.textContent = month;
+                    btn.title = hasData ? `${month} — click to edit revenue` : `${month} — no data yet`;
                     btn.onclick = () => selectMonth(index);
-                    monthsList.appendChild(btn);
+
+                    // Delete button (only visible if month has data)
+                    const delBtn = document.createElement('button');
+                    delBtn.className = `month-delete-btn${hasData ? ' visible' : ''}`;
+                    delBtn.title = `Clear all data for ${month}`;
+                    delBtn.innerHTML = '<i class="fa-regular fa-trash-can"></i>';
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        clearMonthData(index);
+                    };
+
+                    row.appendChild(btn);
+                    row.appendChild(delBtn);
+                    monthsList.appendChild(row);
                 });
             }
             
@@ -388,6 +542,23 @@ document.addEventListener('DOMContentLoaded', () => {
             if (monthsView) monthsView.style.display = 'block';
             if (revenueView) revenueView.style.display = 'none';
             if (modal) modal.classList.add('active');
+        }
+
+        function clearMonthData(monthIndex) {
+            // Reset only revenue sources (YouTube, Instagram, Collaborations, Other)
+            // Brand Deals count is NOT cleared by this button
+            revenueSources.forEach(source => {
+                monthlySourceData[monthIndex][source] = 0;
+            });
+            monthlyData[monthIndex] = 0;
+
+            // Update chart
+            if (chart) chart.update();
+            updateSourceChart();
+            updateTotalRevenueCard(monthIndex);
+
+            // Refresh the months list so delete buttons update visibility
+            openMonthsModal();
         }
 
         function selectMonth(monthIndex) {
@@ -401,6 +572,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (input) input.value = monthlySourceData[monthIndex][source] || '';
             });
             updateRevenueTotal();
+            
+            // Populate brand deals count input
+            const brandDealsInput = document.getElementById('brandDealsCount');
+            if (brandDealsInput) {
+                brandDealsInput.value = monthlySourceData[monthIndex].brandDeals || '';
+            }
+            
+            // Show or hide brand deals container based on whether a value exists
+            const brandDealsContainer = document.getElementById('brandDealsInputContainer');
+            const toggleBrandDealsBtn = document.getElementById('toggleBrandDealsInputBtn');
+            const hasExistingDeals = monthlySourceData[monthIndex].brandDeals > 0;
+            if (brandDealsContainer) {
+                brandDealsContainer.style.display = hasExistingDeals ? 'block' : 'none';
+            }
+            if (toggleBrandDealsBtn) {
+                toggleBrandDealsBtn.innerHTML = hasExistingDeals
+                    ? '<i class="fa-solid fa-minus"></i> Hide Brand Deals count'
+                    : '<i class="fa-solid fa-plus"></i> Add Brand Deals count';
+            }
             
             // Show previous months
             let previousHTML = '';
@@ -521,6 +711,35 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
+        function updateBrandDealsCard(monthIndex) {
+            const brandDealsValue = document.getElementById('brandDealsValue');
+            const brandDealsChange = document.getElementById('brandDealsChange');
+            if (!brandDealsValue) return;
+
+            const currentDeals = monthlySourceData[monthIndex]?.brandDeals || 0;
+            brandDealsValue.textContent = currentDeals;
+
+            if (!brandDealsChange) return;
+
+            const previousDeals = monthIndex > 0 ? (monthlySourceData[monthIndex - 1]?.brandDeals || 0) : 0;
+            const currentMonthName = months[monthIndex] || 'Current';
+            const previousMonthName = monthIndex > 0 ? months[monthIndex - 1] : 'prev';
+
+            brandDealsChange.classList.remove('profit', 'loss', 'neutral');
+
+            const diff = currentDeals - previousDeals;
+            if (diff > 0) {
+                brandDealsChange.textContent = `${currentMonthName} vs ${previousMonthName}: +${diff} deals`;
+                brandDealsChange.classList.add('profit');
+            } else if (diff < 0) {
+                brandDealsChange.textContent = `${currentMonthName} vs ${previousMonthName}: -${Math.abs(diff)} deals`;
+                brandDealsChange.classList.add('loss');
+            } else {
+                brandDealsChange.textContent = `${currentMonthName} vs ${previousMonthName}: no change`;
+                brandDealsChange.classList.add('neutral');
+            }
+        }
+
         function saveRevenue() {
             if (selectedMonth < 0) return;
 
@@ -528,41 +747,600 @@ document.addEventListener('DOMContentLoaded', () => {
                 const input = document.getElementById(`${source}Revenue`);
                 monthlySourceData[selectedMonth][source] = Number(input?.value) || 0;
             });
+
+            // Save brand deals count
+            const brandDealsInput = document.getElementById('brandDealsCount');
+            if (brandDealsInput) {
+                monthlySourceData[selectedMonth].brandDeals = Number(brandDealsInput.value) || 0;
+            }
+
             monthlyData[selectedMonth] = updateRevenueTotal();
             if (chart) {
                 chart.update();
             }
             updateSourceChart();
             updateTotalRevenueCard(selectedMonth);
+            updateBrandDealsCard(selectedMonth);
             closeModal();
         }
 
+/* ==========================================================================
+   TASKS & REMINDERS FUNCTIONALITY
+   ========================================================================== */
 
+document.addEventListener('DOMContentLoaded', () => {
+    // DOM Elements
+    const taskDialog = document.getElementById('taskDialog');
+    const taskForm = document.getElementById('taskForm');
+    const taskList = document.getElementById('taskList');
+    const taskListWrapper = document.querySelector('.task-list-wrapper');
+    const taskCountBadge = document.getElementById('taskCount');
+    
+    const addTaskBtn = document.getElementById('addTaskBtn');
+    const newContBtn = document.querySelector('.newcont'); // Header "+ New Task & Remainders" button
+    const closeTaskDialogBtn = document.getElementById('closeTaskDialogBtn');
+    const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+    const showMoreTasksBtn = document.getElementById('showMoreTasksBtn');
+    
+    const taskDueDateInput = document.getElementById('taskDueDate');
 
-        // API connection//
+    // State
+    let tasks = [];
+    let isTasksExpanded = false;
 
-async function sendMessage(){
-
-    let input = document.getElementById("userInput").value;
-
-    let response = await fetch(
-        "http://127.0.0.1:5000/chat",
+    // Default mock tasks
+    const defaultTasks = [
         {
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                message: input
-            })
+            id: 1,
+            title: "Edit YouTube Video Draft",
+            notes: "Review final cut, add B-roll, background music and color grading.",
+            dueDate: (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 1); // Tomorrow
+                return d.toISOString().split('T')[0];
+            })()
+        },
+        {
+            id: 2,
+            title: "Instagram Collaboration Reels",
+            notes: "Schedule brand partnership video with Sponsor X and tag their profile.",
+            dueDate: (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 3);
+                return d.toISOString().split('T')[0];
+            })()
+        },
+        {
+            id: 3,
+            title: "Monthly Revenue Reconciliation",
+            notes: "Verify sponsorships and AdSense payouts are matching dashboard reports.",
+            dueDate: (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 5);
+                return d.toISOString().split('T')[0];
+            })()
+        },
+        {
+            id: 4,
+            title: "Script Next 3 YouTube Shorts",
+            notes: "Focus on strong hooks (first 3s) and write clear Call to Actions.",
+            dueDate: (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 7);
+                return d.toISOString().split('T')[0];
+            })()
+        },
+        {
+            id: 5,
+            title: "Sponsor Pitch Emails",
+            notes: "Send media kit and summer campaigns proposal to target fashion brands.",
+            dueDate: (() => {
+                const d = new Date();
+                d.setDate(d.getDate() + 10);
+                return d.toISOString().split('T')[0];
+            })()
         }
-    );
+    ];
 
-    let data = await response.json();
+    // Load tasks from localStorage or use defaults
+    function loadTasks() {
+        const storedTasks = localStorage.getItem('tasks');
+        if (storedTasks) {
+            try {
+                tasks = JSON.parse(storedTasks);
+            } catch (e) {
+                console.error("Failed to parse stored tasks:", e);
+                tasks = [...defaultTasks];
+            }
+        } else {
+            tasks = [...defaultTasks];
+            saveTasksToStorage();
+        }
+        renderTasks();
+    }
 
-    document.getElementById("chatBox").innerHTML +=
-    `
-    <p>You: ${input}</p>
-    <p>AI: ${data.reply || data.error}</p>
-    `;
-}
+    function saveTasksToStorage() {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    // Initialize Flatpickr for completion date
+    if (typeof flatpickr !== 'undefined' && taskDueDateInput) {
+        flatpickr(taskDueDateInput, {
+            dateFormat: "Y-m-d",
+            minDate: "today",
+            defaultDate: "today",
+            disableMobile: "true"
+        });
+    }
+
+    // Helper to format due dates nicely
+    function getDueDateBadge(dateStr) {
+        const today = new Date();
+        today.setHours(0,0,0,0);
+        
+        const dueDate = new Date(dateStr);
+        dueDate.setHours(0,0,0,0);
+        
+        const diffTime = dueDate - today;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        
+        if (diffDays < 0) {
+            return { text: `Overdue (${Math.abs(diffDays)}d ago)`, class: 'overdue' };
+        } else if (diffDays === 0) {
+            return { text: 'Today', class: 'urgent' };
+        } else if (diffDays === 1) {
+            return { text: 'Tomorrow', class: 'urgent' };
+        } else if (diffDays <= 3) {
+            return { text: `In ${diffDays} days`, class: 'urgent' };
+        } else {
+            const options = { month: 'short', day: 'numeric' };
+            return { text: dueDate.toLocaleDateString('en-US', options), class: '' };
+        }
+    }
+
+    // Render list items dynamically
+    function renderTasks() {
+        if (!taskList) return;
+        taskList.innerHTML = '';
+        
+        // Update Count badge
+        if (taskCountBadge) {
+            taskCountBadge.textContent = `${tasks.length} ${tasks.length === 1 ? 'Task' : 'Tasks'}`;
+        }
+
+        if (tasks.length === 0) {
+            taskList.innerHTML = `<li style="display: flex; justify-content: center; padding: 30px; color: #64748b; font-size: 13px; font-style: italic; border: 1.5px dashed #cbd5e1; border-radius: 8px;">No current tasks or reminders</li>`;
+            if (showMoreTasksBtn) showMoreTasksBtn.style.display = 'none';
+            if (taskListWrapper) taskListWrapper.style.maxHeight = 'none';
+            return;
+        }
+        // Create tasks HTML
+        tasks.forEach((task, index) => {
+            const badgeInfo = getDueDateBadge(task.dueDate);
+            const li = document.createElement('li');
+            li.className = `task-item${task.completed ? ' completed-task' : ''}`;
+            li.style.animationDelay = `${index * 0.05}s`;
+            
+            li.innerHTML = `
+                <div class="task-complete-btn ${task.completed ? 'completed' : ''}" data-id="${task.id}">
+                    <span class="task-number">${index + 1}</span>
+                    <i class="fa-solid fa-check check-icon"></i>
+                </div>
+                <div class="task-content">
+                    <h4 class="task-item-title">${escapeHTML(task.title)}</h4>
+                    <p class="task-item-notes">${escapeHTML(task.notes || 'No description.')}</p>
+                </div>
+                <div class="task-due-date">
+                    <span class="due-badge ${badgeInfo.class}">
+                        <i class="fa-regular fa-clock"></i> ${badgeInfo.text}
+                    </span>
+                </div>
+                <button class="task-delete-btn" data-id="${task.id}" aria-label="Delete task">
+                    <i class="fa-regular fa-trash-can"></i>
+                </button>
+            `;
+            taskList.appendChild(li);
+        });
+
+        // Handle Expansion Heights and Show More Visibility
+        updateListLayout(false); // Update without animation state changes
+    }
+
+    // Helper to escape HTML to prevent XSS
+    function escapeHTML(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+    // Handle height transition updates
+    function updateListLayout(isToggle = false) {
+        if (!taskList || !taskListWrapper || !showMoreTasksBtn) return;
+
+        const tasksCard = document.querySelector('.tasks');
+        const items = taskList.querySelectorAll('.task-item');
+        
+        // Gaps and paddings
+        const listGap = 8;
+        const cardPadding = 40; // 20px top + 20px bottom
+        const headerHeight = document.querySelector('.tasks-header')?.offsetHeight || 30;
+        const footerHeight = document.querySelector('.tasks-footer')?.offsetHeight || 50;
+
+        // Height for 3 items
+        let collapsedListHeight = 0;
+        for (let i = 0; i < Math.min(3, items.length); i++) {
+            if (items[i]) {
+                collapsedListHeight += items[i].offsetHeight + (i < 2 ? listGap : 0);
+            }
+        }
+        // Total collapsed card content height
+        const collapsedCardHeight = headerHeight + footerHeight + collapsedListHeight + cardPadding + 15;
+
+        // Height for all items
+        let fullListHeight = 0;
+        items.forEach((item, i) => {
+            fullListHeight += item.offsetHeight + (i < items.length - 1 ? listGap : 0);
+        });
+        // Total expanded card content height
+        const fullCardHeight = headerHeight + footerHeight + fullListHeight + cardPadding + 15;
+
+        if (tasks.length > 3) {
+            showMoreTasksBtn.style.display = 'flex';
+            
+            if (isTasksExpanded) {
+                if (isToggle && tasksCard) {
+                    // Clicked "See More" - 2 stage transition:
+                    // Stage 1: Shrink from current card height to collapsed card height ("as small as possible")
+                    tasksCard.classList.remove('expanded');
+                    tasksCard.style.height = `${collapsedCardHeight}px`;
+                    taskListWrapper.style.maxHeight = `${collapsedListHeight}px`;
+                    
+                    // Stage 2: After shrink transition completes, extend to full height
+                    setTimeout(() => {
+                        tasksCard.style.height = `${fullCardHeight}px`;
+                        taskListWrapper.style.maxHeight = `${fullListHeight + 10}px`;
+                    }, 350);
+
+                    // Stage 3: After extend transition completes, set to auto
+                    setTimeout(() => {
+                        tasksCard.classList.add('expanded');
+                        tasksCard.style.height = '';
+                    }, 750);
+                } else {
+                    // Normal render or resize (no animation)
+                    if (tasksCard) {
+                        tasksCard.classList.add('expanded');
+                        tasksCard.style.height = '';
+                    }
+                    taskListWrapper.style.maxHeight = 'none';
+                }
+                showMoreTasksBtn.innerHTML = 'Show Less <i class="fa-solid fa-chevron-up" style="margin-left: 6px;"></i>';
+            } else {
+                if (isToggle && tasksCard) {
+                    // Clicked "Show Less" - collapse card to target row height
+                    tasksCard.classList.remove('expanded');
+                    // Set to current height explicitly first
+                    tasksCard.style.height = `${fullCardHeight}px`;
+                    taskListWrapper.style.maxHeight = `${fullListHeight + 10}px`;
+                    
+                    // Force reflow
+                    tasksCard.offsetHeight;
+                    
+                    // Transition to row height
+                    const rowHeight = window.innerWidth > 1024 ? 300 : (window.innerWidth > 788 ? 260 : 240);
+                    tasksCard.style.height = `${rowHeight}px`;
+                    taskListWrapper.style.maxHeight = `${collapsedListHeight}px`;
+                    
+                    // Clear inline style after transition
+                    setTimeout(() => {
+                        tasksCard.style.height = '';
+                    }, 350);
+                } else {
+                    // Normal render or resize (no animation)
+                    if (tasksCard) {
+                        tasksCard.classList.remove('expanded');
+                        tasksCard.style.height = ''; // uses CSS fixed height
+                    }
+                    taskListWrapper.style.maxHeight = `${collapsedListHeight}px`;
+                }
+                showMoreTasksBtn.innerHTML = 'Show More <i class="fa-solid fa-chevron-down" style="margin-left: 6px;"></i>';
+            }
+        } else {
+            showMoreTasksBtn.style.display = 'none';
+            taskListWrapper.style.maxHeight = 'none';
+            if (tasksCard) {
+                tasksCard.classList.remove('expanded');
+                tasksCard.style.height = '';
+            }
+        }
+    }
+
+    // Modal Interaction
+    function openModal() {
+        if (taskDialog) {
+            // Reset form values
+            taskForm.reset();
+            // Reset flatpickr date input to today
+            if (taskDueDateInput._flatpickr) {
+                taskDueDateInput._flatpickr.setDate(new Date());
+            }
+            taskDialog.showModal();
+        }
+    }
+
+    // Handle form close cleanly
+    function closeModal() {
+        if (taskDialog) {
+            taskDialog.close();
+        }
+    }
+
+    // Toggle completion status
+    function toggleTaskComplete(id) {
+        tasks = tasks.map(task => {
+            if (task.id === id) {
+                return { ...task, completed: !task.completed };
+            }
+            return task;
+        });
+        saveTasksToStorage();
+        renderTasks();
+    }
+
+    // Delete task
+    function deleteTask(id) {
+        tasks = tasks.filter(task => task.id !== id);
+        saveTasksToStorage();
+        renderTasks();
+    }
+
+    // Event Listeners
+    if (taskList) {
+        taskList.addEventListener('click', (e) => {
+            const completeBtn = e.target.closest('.task-complete-btn');
+            if (completeBtn) {
+                const id = parseInt(completeBtn.dataset.id);
+                toggleTaskComplete(id);
+                return;
+            }
+
+            const deleteBtn = e.target.closest('.task-delete-btn');
+            if (deleteBtn) {
+                const id = parseInt(deleteBtn.dataset.id);
+                deleteTask(id);
+                return;
+            }
+        });
+    }
+
+    if (addTaskBtn) addTaskBtn.addEventListener('click', openModal);
+    if (newContBtn) newContBtn.addEventListener('click', openModal);
+    if (closeTaskDialogBtn) closeTaskDialogBtn.addEventListener('click', closeModal);
+    if (cancelTaskBtn) cancelTaskBtn.addEventListener('click', closeModal);
+
+    // Show More Toggle click event
+    if (showMoreTasksBtn) {
+        showMoreTasksBtn.addEventListener('click', () => {
+            isTasksExpanded = !isTasksExpanded;
+            updateListLayout(true);
+        });
+    }
+
+    // Form Submission handler
+    if (taskForm) {
+        taskForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const title = document.getElementById('taskTitle').value.trim();
+            const notes = document.getElementById('taskNotes').value.trim();
+            const dueDate = document.getElementById('taskDueDate').value;
+
+            if (!title || !dueDate) return;
+
+            const newTask = {
+                id: Date.now(),
+                title: title,
+                notes: notes,
+                completed: false,
+                dueDate: dueDate
+            };
+
+            tasks.push(newTask);
+            
+            // Sort tasks by due date (soonest first)
+            tasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            saveTasksToStorage();
+            renderTasks();
+            closeModal();
+        });
+    }
+
+    // Recalculate heights on window resize to ensure responsiveness matches offsets
+    window.addEventListener('resize', () => {
+        updateListLayout(false);
+    });
+
+    // Run initialization
+    loadTasks();
+});
+
+
+/* ==========================================================================
+   AI BUSINESS RECOMMENDATION ENGINE
+   ========================================================================== */
+
+(function () {
+    // --- DOM refs ---
+    const getRecsBtn   = document.getElementById('getRecsBtn');
+    const recOutput    = document.getElementById('recOutput');
+
+    if (!getRecsBtn || !recOutput) return;
+
+    // --- Helpers ---
+
+    /** Escape HTML for safe injection */
+    function esc(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    /** Show an animated skeleton loader while waiting */
+    function showSkeleton() {
+        recOutput.innerHTML = `
+            <div class="rec-skeleton">
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+                <div class="rec-skeleton-card"></div>
+            </div>`;
+    }
+
+    /** Show an error message */
+    function showError(msg) {
+        recOutput.innerHTML = `
+            <div class="rec-error">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>${esc(msg)}</span>
+            </div>`;
+    }
+
+    /** Map priority string → CSS class */
+    function priorityClass(p) {
+        const map = { High: 'high', Medium: 'medium', Low: 'low' };
+        return map[p] || 'medium';
+    }
+
+    /** Render an array of recommendation objects as cards */
+    function renderRecommendations(recs) {
+        if (!recs || !recs.length) {
+            recOutput.innerHTML = '<div class="rec-placeholder"><i class="fa-solid fa-robot"></i><p>No recommendations returned. Try adding more profile details.</p></div>';
+            return;
+        }
+
+        const listEl = document.createElement('div');
+        listEl.className = 'rec-cards-list';
+
+        recs.forEach((rec, i) => {
+            const actionsHTML = (rec.actions || [])
+                .map(a => `<div class="rec-action-item">${esc(a)}</div>`)
+                .join('');
+
+            const card = document.createElement('div');
+            card.className = 'rec-card';
+            card.style.animationDelay = `${i * 0.08}s`;
+            card.innerHTML = `
+                <div class="rec-card-top">
+                    <div class="rec-card-title">${esc(rec.title)}</div>
+                    <span class="rec-priority ${priorityClass(rec.priority)}">${esc(rec.priority)}</span>
+                </div>
+                <span class="rec-category">${esc(rec.category)}</span>
+                <p class="rec-reason">${esc(rec.reason)}</p>
+                <p class="rec-impact"><i class="fa-solid fa-bolt" style="color:#822cfb; font-size:10px; margin-right:3px;"></i>${esc(rec.impact)}</p>
+                <div class="rec-actions">${actionsHTML}</div>
+            `;
+            listEl.appendChild(card);
+        });
+
+        recOutput.innerHTML = '';
+        recOutput.appendChild(listEl);
+    }
+
+    /** Collect creator profile from the form inputs */
+    function getCreatorProfile() {
+        return {
+            niche:         document.getElementById('recNiche')?.value.trim()       || '',
+            followers:     document.getElementById('recFollowers')?.value.trim()   || '',
+            engagement:    document.getElementById('recEngagement')?.value.trim()  || '',
+            avgViews:      document.getElementById('recAvgViews')?.value.trim()    || '',
+            audience:      document.getElementById('recAudience')?.value.trim()    || '',
+            contentType:   document.getElementById('recContentType')?.value.trim() || '',
+            previousDeals: document.getElementById('recPrevDeals')?.value.trim()   || 'None'
+        };
+    }
+
+    /** Collect live dashboard metrics from the global state */
+    function getDashboardData() {
+        try {
+            // monthlyData and monthlySourceData are declared in the revenue chart scope
+            const totalRev = typeof monthlyData !== 'undefined'
+                ? monthlyData.reduce((s, v) => s + v, 0)
+                : 0;
+            const sources = typeof monthlySourceData !== 'undefined'
+                ? monthlySourceData.reduce((acc, m) => {
+                    acc.youtube        += m.youtube        || 0;
+                    acc.instagram      += m.instagram      || 0;
+                    acc.collaborations += m.collaborations || 0;
+                    acc.other          += m.other          || 0;
+                    acc.brandDeals     += m.brandDeals     || 0;
+                    return acc;
+                  }, { youtube: 0, instagram: 0, collaborations: 0, other: 0, brandDeals: 0 })
+                : {};
+
+            return {
+                totalRevenue:          `$${totalRev.toLocaleString()}`,
+                youtubeRevenue:        `$${(sources.youtube || 0).toLocaleString()}`,
+                instagramRevenue:      `$${(sources.instagram || 0).toLocaleString()}`,
+                collaborationRevenue:  `$${(sources.collaborations || 0).toLocaleString()}`,
+                brandDeals:            sources.brandDeals || 0
+            };
+        } catch (e) {
+            return {};
+        }
+    }
+
+    /** Main fetch + render flow */
+    async function fetchRecommendations() {
+        const profile = getCreatorProfile();
+
+        // Require at least a niche before calling the API
+        if (!profile.niche) {
+            recOutput.innerHTML = `
+                <div class="rec-error">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Please enter at least your <strong>Niche / Category</strong> before generating recommendations.</span>
+                </div>`;
+            return;
+        }
+
+        // Show loading state
+        getRecsBtn.disabled = true;
+        getRecsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analysing...';
+        showSkeleton();
+
+        try {
+            const res = await fetch('/api/recommendations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    creatorProfile: profile,
+                    dashboardData:  getDashboardData()
+                })
+            });
+
+            const json = await res.json();
+
+            if (!res.ok || json.error) {
+                showError(json.message || json.error || 'Unknown error from server.');
+                return;
+            }
+
+            renderRecommendations(json.recommendations);
+
+        } catch (err) {
+            showError('Could not reach the server. Make sure the Flask app is running on port 5000.');
+        } finally {
+            getRecsBtn.disabled = false;
+            getRecsBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations';
+        }
+    }
+
+    // Wire up the button
+    getRecsBtn.addEventListener('click', fetchRecommendations);
+})();
