@@ -1176,14 +1176,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 (function () {
     // --- DOM refs ---
-    const getRecsBtn   = document.getElementById('getRecsBtn');
-    const recOutput    = document.getElementById('recOutput');
+    const getRecsBtn     = document.getElementById('getRecsBtn');
+    const recDrawer      = document.getElementById('recDrawer');
+    const recDrawerBody  = document.getElementById('recDrawerBody');
+    const recDrawerClose = document.getElementById('recDrawerClose');
+    const recOverlay     = document.getElementById('recDrawerOverlay');
 
-    if (!getRecsBtn || !recOutput) return;
+    if (!getRecsBtn || !recDrawer || !recDrawerBody) return;
 
     // --- Helpers ---
 
-    /** Escape HTML for safe injection */
     function esc(str) {
         return String(str || '')
             .replace(/&/g, '&amp;')
@@ -1192,9 +1194,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .replace(/"/g, '&quot;');
     }
 
-    /** Show an animated skeleton loader while waiting */
-    function showSkeleton() {
-        recOutput.innerHTML = `
+    function showDrawerSkeleton() {
+        recDrawerBody.innerHTML = `
             <div class="rec-skeleton">
                 <div class="rec-skeleton-card"></div>
                 <div class="rec-skeleton-card"></div>
@@ -1202,25 +1203,36 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>`;
     }
 
-    /** Show an error message */
-    function showError(msg) {
-        recOutput.innerHTML = `
+    function showDrawerError(msg) {
+        recDrawerBody.innerHTML = `
             <div class="rec-error">
                 <i class="fa-solid fa-triangle-exclamation"></i>
                 <span>${esc(msg)}</span>
             </div>`;
+        openDrawer();
     }
 
-    /** Map priority string → CSS class */
     function priorityClass(p) {
         const map = { High: 'high', Medium: 'medium', Low: 'low' };
         return map[p] || 'medium';
     }
 
-    /** Render an array of recommendation objects as cards */
-    function renderRecommendations(recs) {
+    function openDrawer() {
+        recDrawer.classList.add('active');
+        recOverlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDrawer() {
+        recDrawer.classList.remove('active');
+        recOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function renderRecommendationsInDrawer(recs) {
         if (!recs || !recs.length) {
-            recOutput.innerHTML = '<div class="rec-placeholder"><i class="fa-solid fa-robot"></i><p>No recommendations returned. Try adding more profile details.</p></div>';
+            recDrawerBody.innerHTML = '<div class="rec-drawer-placeholder"><i class="fa-solid fa-robot"></i><p>No recommendations returned. Try adding more profile details.</p></div>';
+            openDrawer();
             return;
         }
 
@@ -1248,11 +1260,11 @@ document.addEventListener('DOMContentLoaded', () => {
             listEl.appendChild(card);
         });
 
-        recOutput.innerHTML = '';
-        recOutput.appendChild(listEl);
+        recDrawerBody.innerHTML = '';
+        recDrawerBody.appendChild(listEl);
+        openDrawer();
     }
 
-    /** Collect creator profile from the form inputs */
     function getCreatorProfile() {
         return {
             niche:         document.getElementById('recNiche')?.value.trim()       || '',
@@ -1265,10 +1277,39 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
-    /** Collect live dashboard metrics from the global state */
+    function updateAnalyticsCards(profile) {
+        const audienceVal = document.getElementById('audienceGrowthValue');
+        const audienceChange = document.getElementById('audienceGrowthChange');
+        const engagementVal = document.getElementById('engagementRateValue');
+        const engagementChange = document.getElementById('engagementRateChange');
+
+        if (profile.engagement) {
+            const eng = profile.engagement.replace('%', '');
+            engagementVal.textContent = `${eng}%`;
+            engagementChange.textContent = 'From AI profile data';
+            engagementChange.className = 'revenue-change profit';
+        }
+
+        if (profile.followers) {
+            const num = parseInt(profile.followers.replace(/,/g, ''));
+            if (!isNaN(num)) {
+                audienceVal.textContent = num >= 1000000
+                    ? `${(num / 1000000).toFixed(1)}M`
+                    : num >= 1000
+                        ? `${(num / 1000).toFixed(1)}K`
+                        : num.toLocaleString();
+                audienceChange.textContent = 'From AI profile data';
+                audienceChange.className = 'revenue-change profit';
+            }
+        }
+
+        if (profile.audience) {
+            audienceChange.textContent = `Age: ${profile.audience}`;
+        }
+    }
+
     function getDashboardData() {
         try {
-            // monthlyData and monthlySourceData are declared in the revenue chart scope
             const totalRev = typeof monthlyData !== 'undefined'
                 ? monthlyData.reduce((s, v) => s + v, 0)
                 : 0;
@@ -1295,24 +1336,24 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    /** Main fetch + render flow */
     async function fetchRecommendations() {
         const profile = getCreatorProfile();
 
-        // Require at least a niche before calling the API
         if (!profile.niche) {
-            recOutput.innerHTML = `
+            recDrawerBody.innerHTML = `
                 <div class="rec-error">
                     <i class="fa-solid fa-triangle-exclamation"></i>
                     <span>Please enter at least your <strong>Niche / Category</strong> before generating recommendations.</span>
                 </div>`;
+            openDrawer();
             return;
         }
 
-        // Show loading state
+        updateAnalyticsCards(profile);
         getRecsBtn.disabled = true;
         getRecsBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Analysing...';
-        showSkeleton();
+        showDrawerSkeleton();
+        openDrawer();
 
         try {
             const res = await fetch('/api/recommendations', {
@@ -1327,20 +1368,178 @@ document.addEventListener('DOMContentLoaded', () => {
             const json = await res.json();
 
             if (!res.ok || json.error) {
-                showError(json.message || json.error || 'Unknown error from server.');
+                showDrawerError(json.message || json.error || 'Unknown error from server.');
                 return;
             }
 
-            renderRecommendations(json.recommendations);
+            renderRecommendationsInDrawer(json.recommendations);
 
         } catch (err) {
-            showError('Could not reach the server. Make sure the Flask app is running on port 5000.');
+            showDrawerError('Could not reach the server. Make sure the Flask app is running on port 5000.');
         } finally {
             getRecsBtn.disabled = false;
             getRecsBtn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations';
         }
     }
 
-    // Wire up the button
+    // Wire up
     getRecsBtn.addEventListener('click', fetchRecommendations);
+    if (recDrawerClose) recDrawerClose.addEventListener('click', closeDrawer);
+    if (recOverlay) recOverlay.addEventListener('click', closeDrawer);
 })();
+
+/* ==========================================================================
+   CONTENT MANAGER (Upcoming & Top Performing)
+   ========================================================================== */
+
+document.addEventListener('DOMContentLoaded', () => {
+    const contentDialog = document.getElementById('contentDialog');
+    const contentForm = document.getElementById('contentForm');
+    const contentName = document.getElementById('contentName');
+    const contentImage = document.getElementById('contentImage');
+    const contentImageFile = document.getElementById('contentImageFile');
+    const contentDate = document.getElementById('contentDate');
+    const contentViews = document.getElementById('contentViews');
+    const contentDateGroup = document.getElementById('contentDateGroup');
+    const contentViewsGroup = document.getElementById('contentViewsGroup');
+    const contentPreviewImg = document.getElementById('contentPreviewImg');
+    const contentPreviewPlaceholder = document.getElementById('contentPreviewPlaceholder');
+    const contentDialogTitle = document.getElementById('contentDialogTitle');
+    const closeContentDialogBtn = document.getElementById('closeContentDialogBtn');
+    const cancelContentBtn = document.getElementById('cancelContentBtn');
+    const submitContentBtn = document.getElementById('submitContentBtn');
+
+    let currentSection = '';
+
+    function esc(str) {
+        return String(str || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;');
+    }
+
+    function formatDate(dateStr) {
+        const d = new Date(dateStr);
+        const opts = { month: 'short', day: 'numeric', year: 'numeric' };
+        return d.toLocaleDateString('en-US', opts);
+    }
+
+    function loadContent() {
+        ['upcoming', 'top'].forEach(section => {
+            const list = document.getElementById(`${section}List`);
+            if (!list) return;
+            const items = JSON.parse(localStorage.getItem(`content_${section}`) || '[]');
+            if (section === 'top') {
+                items.sort((a, b) => (Number(b.views) || 0) - (Number(a.views) || 0));
+            }
+            if (items.length === 0) {
+                list.innerHTML = `<div class="content-empty">No content added yet</div>`;
+                return;
+            }
+            list.innerHTML = items.map((item, i) => `
+                <div class="content-item">
+                    <span class="content-rank">${section === 'top' ? `${i + 1}.` : ''}</span>
+                    <img src="${esc(item.image || '')}" alt="${esc(item.name)}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2240%22 height=%2240%22><rect fill=%22%23e2e8f0%22 width=%2240%22 height=%2240%22/><text x=%2220%22 y=%2220%22 text-anchor=%22middle%22 dy=%22.3em%22 fill=%22%2394a3b8%22 font-size=%2210%22>No img</text></svg>'">
+                    <div class="content-item-info">
+                        <span class="content-item-name">${esc(item.name)}</span>
+                        <span class="content-item-date">${section === 'top' ? `${Number(item.views || 0).toLocaleString()} views` : (item.date ? formatDate(item.date) : '')}</span>
+                    </div>
+                    <button class="content-item-delete" data-section="${section}" data-index="${i}"><i class="fa-solid fa-trash-can"></i></button>
+                </div>
+            `).join('');
+        });
+    }
+
+    function saveContent(section, items) {
+        localStorage.setItem(`content_${section}`, JSON.stringify(items));
+        loadContent();
+    }
+
+    // Handle file upload → convert to data URL
+    contentImageFile.addEventListener('change', () => {
+        const file = contentImageFile.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const dataUrl = e.target.result;
+            contentImage.value = dataUrl;
+            contentPreviewImg.src = dataUrl;
+            contentPreviewImg.style.display = 'block';
+            contentPreviewPlaceholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    });
+
+    // URL preview
+    contentImage.addEventListener('input', () => {
+        const url = contentImage.value.trim();
+        if (url) {
+            contentPreviewImg.src = url;
+            contentPreviewImg.style.display = 'block';
+            contentPreviewPlaceholder.style.display = 'none';
+        } else {
+            contentPreviewImg.style.display = 'none';
+            contentPreviewPlaceholder.style.display = 'inline';
+        }
+    });
+
+    // Open dialog with today's date
+    document.querySelectorAll('.add-content-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentSection = btn.dataset.section;
+            contentDialogTitle.textContent = currentSection === 'upcoming' ? 'Add Upcoming Content' : 'Add Top Performing Content';
+
+            if (currentSection === 'upcoming') {
+                contentDateGroup.style.display = '';
+                contentViewsGroup.style.display = 'none';
+                contentDate.required = true;
+                contentViews.required = false;
+            } else {
+                contentDateGroup.style.display = 'none';
+                contentViewsGroup.style.display = '';
+                contentDate.required = false;
+                contentViews.required = true;
+            }
+
+            contentForm.reset();
+            contentDate.value = new Date().toISOString().split('T')[0];
+            contentPreviewImg.style.display = 'none';
+            contentPreviewPlaceholder.style.display = 'inline';
+            contentDialog.showModal();
+        });
+    });
+
+    function closeContentDialog() { contentDialog.close(); }
+    if (closeContentDialogBtn) closeContentDialogBtn.addEventListener('click', closeContentDialog);
+    if (cancelContentBtn) cancelContentBtn.addEventListener('click', closeContentDialog);
+
+    submitContentBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const name = contentName.value.trim();
+        const image = contentImage.value.trim();
+        const date = contentDate.value;
+        const views = contentViews.value;
+        if (!name) return;
+        if (currentSection === 'upcoming' && !date) return;
+        if (currentSection === 'top' && !views) return;
+
+        const items = JSON.parse(localStorage.getItem(`content_${currentSection}`) || '[]');
+        items.push({ name, image, date, views });
+        saveContent(currentSection, items);
+        closeContentDialog();
+    });
+
+    // Delete
+    document.addEventListener('click', (e) => {
+        const delBtn = e.target.closest('.content-item-delete');
+        if (!delBtn) return;
+        const section = delBtn.dataset.section;
+        const index = parseInt(delBtn.dataset.index);
+        const items = JSON.parse(localStorage.getItem(`content_${section}`) || '[]');
+        items.splice(index, 1);
+        saveContent(section, items);
+    });
+
+    loadContent();
+});

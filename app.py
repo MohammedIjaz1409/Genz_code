@@ -115,9 +115,7 @@ def recommendations():
         }), 400
 
     # Build a rich context prompt from creator profile + live dashboard metrics
-    prompt = f"""
-You are an expert creator monetisation strategist. A content creator has shared their profile and business metrics.
-Analyse the data and return EXACTLY 5 business recommendations in valid JSON format.
+    prompt = f"""You are an expert creator monetisation strategist. A content creator has shared their profile and business metrics. Analyse the data and return EXACTLY 5 business recommendations as a JSON array only.
 
 Creator Profile:
 - Niche/Category: {creator.get('niche', 'Not specified')}
@@ -135,27 +133,15 @@ Live Dashboard Metrics:
 - Collaboration Revenue: {dashboard.get('collaborationRevenue', '$0')}
 - Brand Deals This Month: {dashboard.get('brandDeals', 0)}
 
-Return ONLY a raw JSON array — no markdown, no code fences, no extra text.
-Each object must have these exact keys:
-  "title"    — short recommendation title (max 8 words)
-  "reason"   — why this applies to this creator (1-2 sentences)
-  "impact"   — expected business impact (1 sentence)
-  "priority" — exactly one of: "High", "Medium", or "Low"
-  "category" — one of: "Revenue", "Audience", "Content", "Partnerships", "Pricing"
-  "actions"  — array of 2-3 short, concrete action steps (strings)
+Each object must have exactly these keys:
+  "title": "short recommendation title (max 8 words)",
+  "reason": "why this applies (1-2 sentences)",
+  "impact": "expected business impact (1 sentence)",
+  "priority": "High or Medium or Low",
+  "category": "Revenue or Audience or Content or Partnerships or Pricing",
+  "actions": ["action 1", "action 2", "action 3"]
 
-Example format:
-[
-  {{
-    "title": "Partner with gaming hardware brands",
-    "reason": "Your 8% engagement and 18-24 audience closely match gaming peripheral buyers.",
-    "impact": "Could increase sponsorship revenue by 40-60%.",
-    "priority": "High",
-    "category": "Partnerships",
-    "actions": ["Research top gaming keyboard/mouse brands", "Prepare a media kit", "Reach out via email or brand partnership platforms"]
-  }}
-]
-"""
+Return ONLY a raw JSON array. No markdown, no code fences, no extra text."""
 
     try:
         client = OpenAI(
@@ -169,7 +155,7 @@ Example format:
                 "X-Title": "AI Creator Business Manager",
             },
             model="openai/gpt-oss-120b",
-            max_tokens=1000,
+            max_tokens=2000,
             messages=[
                 {"role": "system", "content": "You are a creator business strategist. Always respond with valid raw JSON only. No markdown."},
                 {"role": "user", "content": prompt}

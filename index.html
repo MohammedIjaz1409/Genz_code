@@ -96,14 +96,22 @@
 
 
         <div class="revenue audience">
-            <p>Audience Growth</p> <i class="fa-solid fa-users" style="color: rgb(0, 0, 0);"></i>
-
+            <div class="revenue-info">
+                <p>Followers</p>
+                <h2 id="audienceGrowthValue">--</h2>
+                <span id="audienceGrowthChange" class="revenue-change neutral">Enter data in AI recommendation</span>
+            </div>
+            <i class="fa-solid fa-users" style="color: rgb(0, 0, 0);"></i>
         </div>
 
 
         <div class="revenue engagement">
-            <p>Engagement Rate</p> <i class="fa-regular fa-heart" style="color: rgb(0, 0, 0);"></i>
-
+            <div class="revenue-info">
+                <p>Engagement Rate</p>
+                <h2 id="engagementRateValue">--</h2>
+                <span id="engagementRateChange" class="revenue-change neutral">Enter data in AI recommendation</span>
+            </div>
+            <i class="fa-regular fa-heart" style="color: rgb(0, 0, 0);"></i>
         </div>
     </div>
 
@@ -239,11 +247,19 @@
 
     <div class="content">
         <div class="overview upcoming">
-            <h1>Upcoming Content</h1>
+            <div class="content-section-header">
+                <h1>Upcoming Content</h1>
+                <button class="add-content-btn" data-section="upcoming"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="content-list" id="upcomingList"></div>
         </div>
 
         <div class="overview top">
-            <h1>Top Performing Content</h1>
+            <div class="content-section-header">
+                <h1>Top Performing Content</h1>
+                <button class="add-content-btn" data-section="top"><i class="fa-solid fa-plus"></i></button>
+            </div>
+            <div class="content-list" id="topList"></div>
         </div>
 
         <div class="overview tasks">
@@ -321,11 +337,75 @@
         </div>
     </div>
 
+    <!-- Floating Recommendations Drawer -->
+    <div class="rec-drawer" id="recDrawer">
+        <div class="rec-drawer-header">
+            <div class="rec-drawer-header-content">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color: #822cfb;"></i>
+                <h3>AI Recommendations</h3>
+            </div>
+            <button class="rec-drawer-close" id="recDrawerClose" aria-label="Close Recommendations">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="rec-drawer-body" id="recDrawerBody">
+            <div class="rec-drawer-placeholder">
+                <i class="fa-solid fa-robot"></i>
+                <p>Your recommendations will appear here.</p>
+            </div>
+        </div>
+    </div>
+    <div class="rec-drawer-overlay" id="recDrawerOverlay"></div>
+
     <!-- Floating Button (initially visible) -->
     <div class="floating-ai-button" id="floatingButton">
         <i class="fa-solid fa-robot"></i>
         <span class="button-label">AI Assistant</span>
     </div>
+
+    <!-- Content Modal Dialog (for Upcoming / Top Performing) -->
+    <dialog id="contentDialog" class="task-modal">
+        <div class="task-modal-content">
+            <div class="task-modal-header">
+                <h2><i class="fa-solid fa-file-video" style="color: #822cfb; margin-right: 8px;"></i><span id="contentDialogTitle">Add Content</span></h2>
+                <button id="closeContentDialogBtn" class="close-btn" aria-label="Close dialog"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="contentForm" class="task-form">
+                <div class="form-group">
+                    <label for="contentName">Content Name</label>
+                    <input type="text" id="contentName" required placeholder="e.g. Gaming Montage Ep.5">
+                </div>
+                <div class="form-group">
+                    <label for="contentImage">Image (URL or Upload)</label>
+                    <input type="text" id="contentImage" placeholder="Paste image URL or click below to upload">
+                    <input type="file" id="contentImageFile" accept="image/*" style="margin-top:6px; font-size:12px; color:#475569;">
+                </div>
+                <div class="form-group" id="contentDateGroup">
+                    <label>Upload Date</label>
+                    <input type="date" id="contentDate" required>
+                </div>
+                <div class="form-group" id="contentDateGroup">
+                    <label>Uploaded Date</label>
+                    <input type="date" id="contentDate" required>
+                </div>
+                <div class="form-group" id="contentViewsGroup" style="display:none;">
+                    <label>Views</label>
+                    <input type="number" id="contentViews" min="0" placeholder="e.g. 125000" required>
+                </div>
+                <div class="form-group">
+                    <label>Preview</label>
+                    <div class="content-image-preview" id="contentImagePreview">
+                        <img id="contentPreviewImg" src="" alt="" style="display:none; max-width:100%; max-height:120px; border-radius:6px; object-fit:cover;">
+                        <span id="contentPreviewPlaceholder" style="color:#94a3b8; font-size:12px;">No image</span>
+                    </div>
+                </div>
+                <div class="modal-footer-buttons">
+                    <button type="button" id="cancelContentBtn" class="btn-secondary">Cancel</button>
+                    <button type="button" id="submitContentBtn" class="btn-primary">Add</button>
+                </div>
+            </form>
+        </div>
+    </dialog>
 
     <!-- Tasks & Reminders Modal Dialog -->
     <dialog id="taskDialog" class="task-modal">
